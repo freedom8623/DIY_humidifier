@@ -1,0 +1,96 @@
+C51 COMPILER V9.60.7.0   PWM                                                               12/04/2023 11:06:10 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE PWM
+OBJECT MODULE PLACED IN .\Objects\Pwm.obj
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE Driver\Pwm.c OPTIMIZE(8,SPEED) BROWSE INCDIR(.\Driver;.\User) DEBUG OBJE
+                    -CTEXTEND PRINT(.\Listings\Pwm.lst) TABS(2) OBJECT(.\Objects\Pwm.obj)
+
+line level    source
+
+   1          #include "Pwm.h"
+   2          
+   3          /*************  本地变量声明    **************/
+   4          bit B_1ms;          //1ms标志
+   5          
+   6          bit PWM1_Flag;
+   7          bit PWM2_Flag;
+   8          
+   9          u16 PWM1_Duty;
+  10          u16 PWM2_Duty;
+  11          
+  12          void Pwm_init(void)
+  13          {
+  14   1        
+  15   1         P_SW2 |= 0x80;  //扩展寄存器(XFR)访问使能
+  16   1         
+  17   1         PWM1_Flag = 0;
+  18   1         PWM2_Flag = 0;
+  19   1         //设置初始占空比
+  20   1          PWM1_Duty = 500;
+  21   1          PWM2_Duty = 500;
+  22   1         
+  23   1         
+  24   1          PWMA_CCER1 = 0x00; //写 CCMRx 前必须先清零 CCxE 关闭通道
+  25   1          PWMA_CCER2 = 0x00;
+  26   1          PWMA_CCMR1 = 0x68; //通道模式配置
+  27   1          PWMA_CCMR2 = 0x68;
+  28   1        
+  29   1          PWMA_CCER1 = 0x55; //配置通道输出使能和极性  1PN  /2 PN
+  30   1      
+  31   1      
+  32   1          PWMA_ARRH = (u8)(PWM_PERIOD >> 8); //设置周期时间
+  33   1          PWMA_ARRL = (u8)PWM_PERIOD;
+  34   1      
+  35   1          PWMA_ENO = 0x00;
+  36   1          PWMA_ENO |= ENO1P; //使能输出
+  37   1          PWMA_ENO |= ENO1N; //使能输出
+  38   1          PWMA_ENO |= ENO2P; //使能输出
+  39   1          PWMA_ENO |= ENO2N; //使能输出
+  40   1          
+  41   1          PWMA_PS = 0x00;  //高级 PWM 通道输出脚选择位
+  42   1          PWMA_PS |= PWM1_1; //选择 PWM1_3 通道
+  43   1          PWMA_PS |= PWM2_2; //选择 PWM2_3 通道
+  44   1          
+  45   1           PWMA_BKR = 0x80; //使能主输出
+  46   1          PWMA_CR1 |= 0x01; //开始计时
+  47   1      
+  48   1      
+  49   1      
+  50   1        
+  51   1       }
+  52           
+  53           //========================================================================
+  54          // 函数: UpdatePwm(void)
+C51 COMPILER V9.60.7.0   PWM                                                               12/04/2023 11:06:10 PAGE 2   
+
+  55          // 描述: 更新PWM占空比. 
+  56          // 参数: none.
+  57          // 返回: none.
+  58          // 版本: V1.0, 2012-11-22
+  59          //========================================================================
+  60          void UpdatePwm(void)
+  61          {
+  62   1          PWMA_CCR1H = (u8)(PWM1_Duty >> 8); //设置占空比时间
+  63   1          PWMA_CCR1L = (u8)(PWM1_Duty);
+  64   1          PWMA_CCR2H = (u8)(PWM2_Duty >> 8); //设置占空比时间
+  65   1          PWMA_CCR2L = (u8)(PWM2_Duty);
+  66   1      
+  67   1      }
+  68          
+  69          
+  70           
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    113    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      4    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      3    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

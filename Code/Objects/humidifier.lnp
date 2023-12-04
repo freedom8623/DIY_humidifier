@@ -1,0 +1,9 @@
+".\Objects\STARTUP.obj",
+".\Objects\main.obj",
+".\Objects\Timer.obj",
+".\Objects\Gpio.obj",
+".\Objects\DHT.obj",
+".\Objects\Pwm.obj",
+".\Objects\oled.obj" 
+TO ".\Objects\humidifier" 
+PRINT(".\Listings\humidifier.m51") RAMSIZE(256) 

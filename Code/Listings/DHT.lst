@@ -1,0 +1,109 @@
+C51 COMPILER V9.60.7.0   DHT                                                               12/04/2023 11:06:10 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE DHT
+OBJECT MODULE PLACED IN .\Objects\DHT.obj
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE Driver\DHT.c OPTIMIZE(8,SPEED) BROWSE INCDIR(.\Driver;.\User) DEBUG OBJE
+                    -CTEXTEND PRINT(.\Listings\DHT.lst) TABS(2) OBJECT(.\Objects\DHT.obj)
+
+line level    source
+
+   1          #include "DHT.h"
+   2          
+   3          
+   4          //单总线传输
+   5          //延时函数
+   6          
+   7          
+   8          void Delay20ms()    //@24.000MHz
+   9          {
+  10   1        unsigned char i, j, k;
+  11   1      
+  12   1        _nop_();
+  13   1        _nop_();
+  14   1        i = 2;
+  15   1        j = 211;
+  16   1        k = 231;
+  17   1        do
+  18   1        {
+  19   2          do
+  20   2          {
+  21   3            while (--k);
+  22   3          } while (--j);
+  23   2        } while (--i);
+  24   1      }
+  25          void Delay40us()    //@24.000MHz
+  26          {
+  27   1        unsigned char i;
+  28   1      
+  29   1        _nop_();
+  30   1        _nop_();
+  31   1        i = 237;
+  32   1        while (--i);
+  33   1      }
+  34          
+  35          
+  36          
+  37          
+  38          char datas[5];    //数组分别代表，湿度，湿度小数，温度，温度小数，校验
+  39          //初始化模块（检测模块是否存在）每次传输数据都要初始化
+  40          void DHT_Start()
+  41          {
+  42   1        
+  43   1          DHT = 1;    //对应初始化时序start
+  44   1          DHT = 0;
+  45   1          Delay20ms();
+  46   1          DHT=1;
+  47   1          while(DHT);
+  48   1          while(!DHT);
+  49   1          while(DHT);
+  50   1      
+  51   1      }
+  52          
+  53          void DHT11_Read()
+  54          {
+C51 COMPILER V9.60.7.0   DHT                                                               12/04/2023 11:06:10 PAGE 2   
+
+  55   1        char value = 0;
+  56   1        char flag;
+  57   1        char i = 0;
+  58   1        char j = 0;
+  59   1        DHT_Start();
+  60   1        for(j = 0;j<5;j++)//分别读取五组数据
+  61   1        {     
+  62   2          for(i=0;i<8;i++)//每组八位分别处理
+  63   2          {   
+  64   3            while(!DHT);    //高电平开始计时
+  65   3            Delay40us();
+  66   3            if(DHT == 1)  //如果还为高则是“1”
+  67   3            {   
+  68   4              flag = 1;
+  69   4              while(DHT);
+  70   4            }
+  71   3             else       //否则“0”
+  72   3            {       
+  73   4              flag = 0;
+  74   4            }
+  75   3            value = value << 1;   //移位
+  76   3            value |= flag;      //赋值
+  77   3          }
+  78   2          datas[j] = value;     //赋值
+  79   2        }
+  80   1      
+  81   1      }
+  82          
+  83          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     91    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      5    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
