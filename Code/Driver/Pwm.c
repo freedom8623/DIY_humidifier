@@ -6,8 +6,8 @@ bit B_1ms;          //1ms±Í÷æ
 bit PWM1_Flag;
 bit PWM2_Flag;
 
-u16 PWM1_Duty;
-u16 PWM2_Duty;
+extern u16 PWM1_Duty = 0;
+extern u16 PWM2_Duty  = 0;
 
 void Pwm_init(void)
 {

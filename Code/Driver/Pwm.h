@@ -14,6 +14,7 @@
 #define ENO2N       0x08
 
 #define PWM_PERIOD  1023    //设置周期值
+//占空比
 
 
 void Pwm_init(void);

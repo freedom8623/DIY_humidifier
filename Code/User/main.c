@@ -2,13 +2,18 @@
 #include "Gpio.h"
 #include "Timer.h"
 #include "DHT.h"
+#include "Pwm.h"
 #include "oled.h"
 
 //蜂鸣器
 sbit Buzzer = P3^7;
 //水位检测引脚
-sbit Water_test = P3^6;
+sbit test = P2^4;
+sbit Water_test = P1^1;
 
+
+
+sbit test2 =P2^3 ;
 
 sbit KEY1 = P3^2;
 sbit KEY2 = P3^3;
@@ -21,9 +26,13 @@ void DHT_Read(void);
 void Key_Proc(void);
 //水位
 void Alertor(void);
+//OLED 显示函数
+void Display_Screen(void);
+void Setting_Pwm(u16 Duty1,u16 Duty2);
+//pwm占空比
+extern u16 PWM1_Duty;
+extern u16 PWM2_Duty;
 
-
-uchar i = 0;
 //按键
 struct keys key[4] = {0,0,0};
 uchar Key_T = 0;
@@ -36,22 +45,34 @@ int T_Tick;//一毫米累加
 void main(void)
 { 
 	Gpio_init();//GPIO初始化
-	Timer2_init();//定时器初始化
-	DHT_Start();
+//	Timer2_init();//定时器初始化
+	
+	//Pwm_init();//产生pwm;占空比50%
+	//UpdatePwm();//更新占空比   //在PWM.C中更改占空比使得产生频率为108khz
+	//DHT_Start();//温湿度
+	
+	
 	//OLED初始化
-	OLED_Init();			//初始化OLED  
-	OLED_Clear()  	; 
+	oled_Init();			//初始化OLED  
+	oled_clear()  	; 
+	oled_ShowStr(0,0,"1124'xiaolala",16);
 	
 	//相关开关
 	EA = 1;     //打开总中断
-	
 
+	//Buzzer = 1;
 	while(1)
 	{
-		Buzzer = 1;//测试蜂鸣器
-		Key_Proc();
-		DHT_Read();
-		Alertor();
+		
+		P11  = 1;
+		//test = 0;
+		Buzzer = 0;//测试蜂鸣器
+		
+		test2 = 0;
+//		Key_Proc();
+		//DHT_Read();
+		//Alertor();
+		//Display_Screen();
 		
 	}
 }
@@ -73,6 +94,7 @@ void DHT_Read()
 //定时器中断
 void timer2_int (void) interrupt 12
 {
+	uchar i = 0;
 	T_Tick ++;
 	if(T_Tick>10000) T_Tick = 0;
     	//第一步读取按键状态
@@ -140,18 +162,28 @@ void timer2_int (void) interrupt 12
 		}
 }
 
-//按键进程
+
+char Show_Flag = 0;
+void Display_Screen(void)
+{
+	if(T_Tick%100==0) Show_Flag = 1;
+	else return;
+	
+}
+
+//按键处理
 void Key_Proc(void)
 {
 	if(key[0].single_flag == 1)
 	{
-		
+		Buzzer ^= 1; 
 		key[0].single_flag = 0;
 	
 	}
 	
 	 if(key[1].single_flag == 1)
 	{
+		test2 ^= 1;
 		
 		key[1].single_flag = 0;
 	
@@ -172,7 +204,7 @@ void Key_Proc(void)
 	}
 }
 
-//蜂鸣器进程
+//水位/蜂鸣器（报警器）进程
 char Water_Flag = 0;
 void Alertor(void)
 {
@@ -189,7 +221,13 @@ void Alertor(void)
 	}
 }
 
-//测水位进程
+void Setting_Pwm(u16 Duty1,u16 Duty2)
+{
+		PWM1_Duty = Duty1;
+		PWM2_Duty = Duty2;
+	
+		UpdatePwm();
+}
 
 
 

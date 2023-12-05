@@ -1,0 +1,151 @@
+C51 COMPILER V9.60.7.0   IIC                                                               12/04/2023 16:20:37 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE IIC
+OBJECT MODULE PLACED IN .\Objects\iic.obj
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE Driver\iic.c OPTIMIZE(8,SPEED) BROWSE INCDIR(.\Driver;.\User) DEBUG OBJE
+                    -CTEXTEND PRINT(.\Listings\iic.lst) TABS(2) OBJECT(.\Objects\iic.obj)
+
+line level    source
+
+   1          #include "iic.h"
+   2          
+   3          /*初始化函数，把2条信号线拉高（状态为释放）*/
+   4          void iic_Init(void)
+   5          {
+   6   1        P2M1 = 0x00;
+   7   1        P2M0 = 0x00;
+   8   1        IIC_SDA_H;
+   9   1        IIC_SCL_H;
+  10   1        _nop_();_nop_();_nop_();_nop_();
+  11   1      }
+  12          
+  13          /*产生一个开始信号的函数*/
+  14          void iic_Start(void)
+  15          {
+  16   1        IIC_SDA_H;
+  17   1        _nop_();_nop_();_nop_();_nop_();_nop_();
+  18   1        IIC_SCL_H;
+  19   1        _nop_();_nop_();_nop_();_nop_();_nop_();
+  20   1        IIC_SDA_L;
+  21   1        _nop_();_nop_();_nop_();_nop_();_nop_();
+  22   1        IIC_SCL_L;
+  23   1      }
+  24          
+  25          /*产生一个结束信号的函数*/
+  26          void iic_Stop(void)
+  27          {
+  28   1        IIC_SCL_L;
+  29   1        IIC_SDA_L;
+  30   1        _nop_();_nop_();_nop_();_nop_();
+  31   1        IIC_SCL_H;
+  32   1        IIC_SDA_H;
+  33   1        _nop_();_nop_();_nop_();_nop_();_nop_();
+  34   1      }
+  35          
+  36          /*产生一个应答信号的函数*/
+  37          void iic_Ack(void)
+  38          {
+  39   1        IIC_SCL_L;
+  40   1        IIC_SDA_L;
+  41   1        _nop_();_nop_();
+  42   1        IIC_SCL_H;
+  43   1        _nop_();_nop_();_nop_();_nop_();_nop_();
+  44   1        IIC_SCL_L;
+  45   1      }
+  46          
+  47          /*产生一个非应答信号的函数*/
+  48          void iic_NAck(void)
+  49          {
+  50   1        IIC_SCL_L;
+  51   1        IIC_SDA_H;
+  52   1        _nop_();_nop_();
+  53   1        IIC_SCL_H;
+  54   1        _nop_();_nop_();_nop_();_nop_();_nop_();
+C51 COMPILER V9.60.7.0   IIC                                                               12/04/2023 16:20:37 PAGE 2   
+
+  55   1        IIC_SCL_L;
+  56   1      }
+  57          
+  58          /*等待从机发送的应答信号的函数*/
+  59          unsigned char iic_Wait_Ack(void)
+  60          {
+  61   1        unsigned char ACK = 0;
+  62   1        IIC_SDA_H;
+  63   1        _nop_();
+  64   1        IIC_SCL_H;
+  65   1        _nop_();
+  66   1        if(IIC_SDA_READ)
+  67   1        {
+  68   2          ACK = 1;
+  69   2        }
+  70   1        else
+  71   1        {
+  72   2          ACK = 0;
+  73   2        }
+  74   1        IIC_SCL_L;
+  75   1        _nop_();_nop_();
+  76   1        return ACK;
+  77   1      }
+  78          
+  79          /*发送一个数据的函数*/
+  80          void iic_SendData(unsigned char dat)
+  81          {
+  82   1        unsigned char i;
+  83   1        for(i = 0;i < 8;i++)
+  84   1        {
+  85   2          if(dat & 0x80)
+  86   2          {
+  87   3            IIC_SDA_H;
+  88   3          }
+  89   2          else
+  90   2          {
+  91   3            IIC_SDA_L;
+  92   3          }
+  93   2          dat<<=1;
+  94   2          _nop_();_nop_();
+  95   2          IIC_SCL_H;
+  96   2          _nop_();_nop_();
+  97   2          IIC_SCL_L;
+  98   2          _nop_();_nop_();
+  99   2        }
+ 100   1      }
+ 101          
+ 102          /*读取一个数据的函数*/
+ 103          unsigned char iic_ReadData(void)
+ 104          {
+ 105   1        unsigned char i,receive = 0;
+ 106   1        for(i=0;i<8;i++)
+ 107   1        {
+ 108   2          IIC_SCL_L;
+ 109   2          _nop_();_nop_();
+ 110   2          IIC_SCL_H;
+ 111   2          receive<<=1;
+ 112   2          if(IIC_SDA_READ)receive++;
+ 113   2          _nop_();
+ 114   2        }
+ 115   1        _nop_();_nop_();_nop_();
+ 116   1        IIC_SCL_L;
+C51 COMPILER V9.60.7.0   IIC                                                               12/04/2023 16:20:37 PAGE 3   
+
+ 117   1        return receive;
+ 118   1      }
+ 119          
+ 120          
+ 121          
+ 122          
+ 123          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    168    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

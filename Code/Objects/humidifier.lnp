@@ -4,6 +4,9 @@
 ".\Objects\Gpio.obj",
 ".\Objects\DHT.obj",
 ".\Objects\Pwm.obj",
+".\Objects\delay.obj",
+".\Objects\font.obj",
+".\Objects\iic.obj",
 ".\Objects\oled.obj" 
 TO ".\Objects\humidifier" 
 PRINT(".\Listings\humidifier.m51") RAMSIZE(256) 
