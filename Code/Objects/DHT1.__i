@@ -1,0 +1,1 @@
+"Driver\DHT1.c" OPTIMIZE (8,SPEED) BROWSE INCDIR(.\Driver;.\User) DEBUG OBJECTEXTEND PRINT(.\Listings\DHT1.lst) TABS (2) OBJECT(.\Objects\DHT1.obj)

@@ -1,247 +1,309 @@
+
 #include "oled.h"
-
-/*这个是oled发送指令的函数*/
-void oled_IIC_SendCommand(unsigned char IIC_Command)
+#include "oledfont.h"  	 
+#include "intrins.h"  
+//OLED的显存
+//存放格式如下.
+//[0]0 1 2 3 ... 127	
+//[1]0 1 2 3 ... 127	
+//[2]0 1 2 3 ... 127	
+//[3]0 1 2 3 ... 127	
+//[4]0 1 2 3 ... 127	
+//[5]0 1 2 3 ... 127	
+//[6]0 1 2 3 ... 127	
+//[7]0 1 2 3 ... 127 			   
+void delay_ms(unsigned int ms)
+{                         
+	unsigned char i, j;
+while(ms--)
 {
-	iic_Start();//IIC协议开始信号
-	iic_SendData(0x78);//发送设备地址
-	iic_Wait_Ack();//等待应答，这里应答可以不用处理，一般会给一个应答信号
-	iic_SendData(0x00);//设置D/C为0，为指令模式
-	iic_Wait_Ack();//等待应答
-	iic_SendData(IIC_Command);//发送指令
-	iic_Wait_Ack();//等待应答
-	iic_Stop();//IIC协议结束信号
-}
-
-/*这个是oled发送数据的函数*/
-void oled_IIC_SendData(unsigned char IIC_Data)
-{
-	iic_Start();//IIC协议开始信号
-	iic_SendData(0x78);//发送设备地址
-	iic_Wait_Ack();//等待应答，这里应答可以不用处理，一般会给一个应答信号
-	iic_SendData(0x40);//设置D/C为1，为数据模式
-	iic_Wait_Ack();//等待应答
-	iic_SendData(IIC_Data);//发送数据
-	iic_Wait_Ack();//等待应答
-	iic_Stop();//IIC协议结束信号
-}
-
-/*这个是oled清屏函数*/
-void oled_clear(void)
-{
-	unsigned char i,j;//定义2个变量等下来实现循环
-	for(i = 0;i < 8;i++)//这里是由于SSD1306分了8页：0-7
+	_nop_();
+	i = 32;
+	j = 40;
+	do
 	{
-		oled_IIC_SendCommand(0xb0+i);//这里是按页分配总共8页：0xb0-0xb7
-		oled_IIC_SendCommand(0x00);//设置低4位地址，这里重新配置会被置为0000
-		oled_IIC_SendCommand(0x10);//设置高4位地址，这里重新配置会被置为0000
-		for(j = 0;j < 128;j++)//每一行的长度是128bit
+		while (--j);
+	} while (--i);
+}
+}
+
+//反显函数
+void OLED_ColorTurn(u8 i)
+{
+	if(i==0)
 		{
-			oled_IIC_SendData(0x00);//这里时每次都写0x00
+			OLED_WR_Byte(0xA6,OLED_CMD);//正常显示
 		}
+	if(i==1)
+		{
+			OLED_WR_Byte(0xA7,OLED_CMD);//反色显示
+		}
+}
+
+//屏幕旋转180度
+void OLED_DisplayTurn(u8 i)
+{
+	if(i==0)
+		{
+			OLED_WR_Byte(0xC8,OLED_CMD);//正常显示
+			OLED_WR_Byte(0xA1,OLED_CMD);
+		}
+	if(i==1)
+		{
+			OLED_WR_Byte(0xC0,OLED_CMD);//反转显示
+			OLED_WR_Byte(0xA0,OLED_CMD);
+		}
+}
+
+//延时
+void IIC_delay(void)
+{
+	u8 t=1;
+	while(t--);
+}
+
+//起始信号
+void I2C_Start(void)
+{
+	OLED_SDA_Set();
+	OLED_SCL_Set();
+	IIC_delay();
+	OLED_SDA_Clr();
+	IIC_delay();
+	OLED_SCL_Clr();
+	 
+}
+
+//结束信号
+void I2C_Stop(void)
+{
+	OLED_SDA_Clr();
+	OLED_SCL_Set();
+	IIC_delay();
+	OLED_SDA_Set();
+}
+
+//等待信号响应
+void I2C_WaitAck(void) //测数据信号的电平
+{
+	OLED_SDA_Set();
+	IIC_delay();
+	OLED_SCL_Set();
+	IIC_delay();
+	OLED_SCL_Clr();
+	IIC_delay();
+}
+
+//写入一个字节
+void Send_Byte(u8 dat)
+{
+	u8 i;
+	for(i=0;i<8;i++)
+	{
+		OLED_SCL_Clr();//将时钟信号设置为低电平
+		if(dat&0x80)//将dat的8位从最高位依次写入
+		{
+			OLED_SDA_Set();
+    }
+		else
+		{
+			OLED_SDA_Clr();
+    }
+		IIC_delay();
+		OLED_SCL_Set();
+		IIC_delay();
+		OLED_SCL_Clr();
+		dat<<=1;
+  }
+}
+
+//发送一个字节
+//向SSD1306写入一个字节。
+//mode:数据/命令标志 0,表示命令;1,表示数据;
+void OLED_WR_Byte(u8 dat,u8 mode)
+{
+	I2C_Start();
+	Send_Byte(0x78);
+	I2C_WaitAck();
+	if(mode){Send_Byte(0x40);}
+  else{Send_Byte(0x00);}
+	I2C_WaitAck();
+	Send_Byte(dat);
+	I2C_WaitAck();
+	I2C_Stop();
+}
+
+//坐标设置
+
+void OLED_Set_Pos(u8 x, u8 y) 
+{ 
+	OLED_WR_Byte(0xb0+y,OLED_CMD);
+	OLED_WR_Byte(((x&0xf0)>>4)|0x10,OLED_CMD);
+	OLED_WR_Byte((x&0x0f),OLED_CMD);
+}   	  
+//开启OLED显示    
+void OLED_Display_On(void)
+{
+	OLED_WR_Byte(0X8D,OLED_CMD);  //SET DCDC命令
+	OLED_WR_Byte(0X14,OLED_CMD);  //DCDC ON
+	OLED_WR_Byte(0XAF,OLED_CMD);  //DISPLAY ON
+}
+//关闭OLED显示     
+void OLED_Display_Off(void)
+{
+	OLED_WR_Byte(0X8D,OLED_CMD);  //SET DCDC命令
+	OLED_WR_Byte(0X10,OLED_CMD);  //DCDC OFF
+	OLED_WR_Byte(0XAE,OLED_CMD);  //DISPLAY OFF
+}		   			 
+//清屏函数,清完屏,整个屏幕是黑色的!和没点亮一样!!!	  
+void OLED_Clear(void)  
+{  
+	u8 i,n;		    
+	for(i=0;i<8;i++)  
+	{  
+		OLED_WR_Byte (0xb0+i,OLED_CMD);    //设置页地址（0~7）
+		OLED_WR_Byte (0x00,OLED_CMD);      //设置显示位置—列低地址
+		OLED_WR_Byte (0x10,OLED_CMD);      //设置显示位置—列高地址   
+		for(n=0;n<128;n++)OLED_WR_Byte(0,OLED_DATA); 
+	} //更新显示
+}
+
+//在指定位置显示一个字符,包括部分字符
+//x:0~127
+//y:0~63				 
+//sizey:选择字体 6x8  8x16
+void OLED_ShowChar(u8 x,u8 y,u8 chr,u8 sizey)
+{      	
+	u8 c=0,sizex=sizey/2;
+	u16 i=0,size1;
+	if(sizey==8)size1=6;
+	else size1=(sizey/8+((sizey%8)?1:0))*(sizey/2);
+	c=chr-' ';//得到偏移后的值
+	OLED_Set_Pos(x,y);
+	for(i=0;i<size1;i++)
+	{
+		if(i%sizex==0&&sizey!=8) OLED_Set_Pos(x,y++);
+		if(sizey==8) OLED_WR_Byte(asc2_0806[c][i],OLED_DATA);//6X8字号
+		else if(sizey==16) OLED_WR_Byte(asc2_1608[c][i],OLED_DATA);//8x16字号
+//		else if(sizey==xx) OLED_WR_Byte(asc2_xxxx[c][i],OLED_DATA);//用户添加字号
+		else return;
 	}
 }
-
-/*这个是oled初始化函数*/
-void oled_Init(void)
+//m^n函数
+unsigned intoled_pow(u8 m,u8 n)
 {
-	iic_Stop();//IIC协议初始化
-	Delay_ms(200);//这里是上电后延迟，等待oled复位。
-	oled_IIC_SendCommand(0xAE);//.关闭显示
-	
-	oled_IIC_SendCommand(0xD5);//.设置时钟分频因子，震荡频率
-	oled_IIC_SendCommand(0x80);//.低4位设置分频因子，高4位设置震荡频率
-	
-	oled_IIC_SendCommand(0xA8);//.设置驱动路数
-	oled_IIC_SendCommand(0x3F);//.默认0x3F（1/64）
-	
-	oled_IIC_SendCommand(0xD3);//.设置显示偏移
-	oled_IIC_SendCommand(0x00);//.默认为0
-	
-	oled_IIC_SendCommand(0x00);//.设置显示位置-列低地址
-	oled_IIC_SendCommand(0x10);//.设置显示位置-列高地址
-	oled_IIC_SendCommand(0x40);//.设置显示开始行[5:0]，行数
-	
-	oled_IIC_SendCommand(0x8D);//.电荷泵设置
-	oled_IIC_SendCommand(0x14);//.bit2：开启/关闭
-	
-	oled_IIC_SendCommand(0x20);//设置内存寻址模式
-	oled_IIC_SendCommand(0x02);//设置成为页面寻址模式
-	
-	oled_IIC_SendCommand(0xA1);//.段重定义设置，bit0：0，0->1;1:0->127;这里是设置成1，是将127映射到SEG0
-	
-	oled_IIC_SendCommand(0xC8);//.设置COM扫描方向，bit3：0：普通模式；1：重定义模式（COM[N-1]->COM0,N:驱动路数）;
-	oled_IIC_SendCommand(0xDA);//.设置COM引脚的硬件配置
-	oled_IIC_SendCommand(0x12);//.A[5:4]，这里只配置了第5位，启动了COM的左右映射，顺序COM引脚配置
-	
-	oled_IIC_SendCommand(0x81);//.设置对比度
-	oled_IIC_SendCommand(0xEF);//.这里设置成EF，默认是7F，数据越大对比度越大
-	
-	oled_IIC_SendCommand(0xD9);//.设置预充电周期
-	oled_IIC_SendCommand(0xF1);//.第一阶段为1个时钟周期，第二阶段为15个时间周期
-	
-	oled_IIC_SendCommand(0xDB);//.设置VCOMH电压倍率
-	oled_IIC_SendCommand(0x30);//.[6:4]000：0.65*vcc；001：0.77*vcc；011：0.83*vcc；
-	
-	oled_IIC_SendCommand(0xA4);//恢复到RAM内容显示
-	oled_IIC_SendCommand(0xA6);//.设置显示方式；bit0：1反向显示；0正常显示；
-	oled_IIC_SendCommand(0xAF);//.开启显示
-	oled_clear();
-}
-
-/*这个是oled开显示函数*/
-void oled_Display_ON(void)
-{
-	oled_IIC_SendCommand(0x8D);//电荷泵设置指令
-	oled_IIC_SendCommand(0x14);//打开电荷泵
-	oled_IIC_SendCommand(0xAF);//打开显示
-}
-
-/*这个是oled关显示函数*/
-void oled_Display_OFF(void)
-{
-	oled_IIC_SendCommand(0x8D);//电荷泵设置指令
-	oled_IIC_SendCommand(0x10);//关闭电荷泵
-	oled_IIC_SendCommand(0xAE);//关闭显示
-}
-
-
-/*这个是oled全屏填充函数*/
-void oled_Allfill(unsigned char fill_Data)
-{
-	unsigned char i,j;//定义2个变量等下来实现循环
-	for(i = 0;i < 8;i++)//这里是由于SSD1306分了8页：0-7
-	{
-		oled_IIC_SendCommand(0xb0+i);//这里是按页分配总共8页：0xb0-0xb7
-		oled_IIC_SendCommand(0x00);//设置低4位地址，这里重新配置会被置为0000
-		oled_IIC_SendCommand(0x10);//设置高4位地址，这里重新配置会被置为0000
-		for(j = 0;j < 128;j++)//每一行的长度是128bit
-		{
-			oled_IIC_SendData(fill_Data);//这里时每次都写fill_Data这个值
-		}
-	}
-}
-
-/*这个是oled设置光标函数*/
-void oled_SetPos(unsigned char x,unsigned char y)
-{
-	oled_IIC_SendCommand(0XB0+y);//这里是确定在哪个页面开始的光标
-	oled_IIC_SendCommand((x&0xf0)>>4|0x10);//这里是设置高4位的列
-	oled_IIC_SendCommand((x&0x0f));//这里是设置低4位的列
-}
-
-
-/*计算m^n的函数*/
-unsigned int oled_Pow(unsigned char m,unsigned char n)
-{
-	unsigned int	result = 1;//设置变量为当n为0时的数据1
-	if(n!=0){while(n--)result *= m;}//这里时判断n是否为0，如果是直接输出1即可，如果不是再运算
+	unsigned int result=1;	 
+	while(n--)result*=m;    
 	return result;
-}
-
-/*这个是oled显示数字函数*/
-void oled_ShowNum(unsigned char x,unsigned char y,int num,unsigned char len,unsigned char size)
-{
-	unsigned char t,temp;
-	
-	if(num<0)//这里是判断输入的数是负数不是
+}				  
+//显示数字
+//x,y :起点坐标
+//num:要显示的数字
+//len :数字的位数
+//sizey:字体大小		  
+void OLED_ShowNum(u8 x,u8 y,unsigned int num,u8 len,u8 sizey)
+{         	
+	u8 t,temp,m=0;
+	u8 enshow=0;
+	if(sizey==8)m=2;
+	for(t=0;t<len;t++)
 	{
-		num *= (-1);//是负数就转为
-		oled_ShowChar(x-(size/2),y,'-',16);//在x位置的前一个size位置上显示负号
-	}
-	for(t=0;t<len;t++)//根据数字长度循环
-	{
-		temp = (num/oled_Pow(10,len-t-1))%10;//取出进制位的数字
-		oled_ShowChar(x+(size/2)*t,y,temp+'0',size);//显示每一个位的数字
-	}
-	
-}
-
-/*这个是oled显示一个字符函数*/
-void oled_ShowChar(unsigned char x,unsigned char y,unsigned char ch,unsigned char size)
-{
-	unsigned char c=0,i=0;
-	c = ch - ' ';//获取字符的偏移量
-	if(x+size/2>127){x = 0; y = y+2;}//这里是判断x位置是否已经超过显示宽度，如果超过就到2页后
-	
-	if(size == 8)//判断是8*6的字符
-	{
-		oled_SetPos(x,y);//设置开始位置为x，y（第一页）
-		for(i=0;i<6;i++)//循环6个列数据，因为只需要一页，所以写完一页即可
-			oled_IIC_SendData(F6X8[c][i]);
-	}
-	if(size == 16)//判断是16*8的字符
-	{
-		oled_SetPos(x,y);//设置开始位置为x，y（第一页）
-		for(i=0;i<8;i++)//循环8个列数据
-			oled_IIC_SendData(F8X16[c*16+i]);//这里的C是偏移量，然后c*16是为了在数组里找到我们要的字符，i是数组第0-7的数据
-		oled_SetPos(x,y+1);	//因为这里的16*8的字符需要2页，设置第二页为开始位置
-		for(i=0;i<8;i++)//这里是第二页的列数据循环
-			oled_IIC_SendData(F8X16[c*16+i+8]);//这里出现了+8是因为我们数组的第8-15个数据
-	}
-}
-
-/*这个是oled显示字符串函数*/
-void oled_ShowStr(unsigned char x,unsigned char y,const unsigned char *p,unsigned char size)
-{
-	while((*p <= '~') && (*p >= ' '))//判这个是判断是否是ASCLL表里的字符，如果小于或者大于就不打印
-	{
-		if(x>(128-(size/2)))//这里是判断是否超过每行的宽度128bit
+		temp=(num/oled_pow(10,len-t-1))%10;
+		if(enshow==0&&t<(len-1))
 		{
-			x = 0;//如果超过就把x置为第一位
-			y += size;//然后把y加到下一行
+			if(temp==0)
+			{
+				OLED_ShowChar(x+(sizey/2+m)*t,y,' ',sizey);
+				continue;
+			}else enshow=1;
 		}
-		if(y > (64-size))//这里是判断是否超过整个屏宽度64bit
-		{
-			y = x = 0;//这里是重新回到0行0列的位置
-			oled_clear();//然后清屏
-		}
-		oled_ShowChar(x,y,*p,size);//这里就是运用到上面显示一个字符的函数（因为这个字符可以看成由多个字符组成的）
-		x += size/2;//这里是每次写一个字符后要把x（列）往右偏移字符相关的宽度
-		p++;//字符串指针增加，也就是到下一个字符
+	 	OLED_ShowChar(x+(sizey/2+m)*t,y,temp+'0',sizey);
 	}
 }
-
-/*
-	@brief			显示中文
-	@param	x：起始列；一个字体占16列
-					y：起始页；一个字体占两页
-	@retval			无
- */
-void oled_ShowCN(unsigned char x,unsigned char y,unsigned char bit_temp)
+//显示一个字符号串
+void OLED_ShowString(u8 x,u8 y,u8 *chr,u8 sizey)
 {
-	unsigned char i;
-	oled_SetPos(x,y);//设置开始位置x，y（第一页）
-	for(i = 0;i < 16;i++)//循环16次发送数据，因为这里一个汉字是占用2页，长度宽度都是16
-	{
-		oled_IIC_SendData(Hzk[2*bit_temp][i]);
-		/*
-		写入第一页数，由于这里是二维数组然后bit_temp是定位我们自定义中文字库里
-		的位置相应的汉字，2*bit_temp就是一个汉字的size
-		*/
-	}
-	oled_SetPos(x,y+1);//设置第二页位置
-	for(i = 0;i < 16;i++)//然后再写入第二页数据
-	{
-		oled_IIC_SendData(Hzk[2*bit_temp+1][i]);//这里出现了+1这就是跳到下一页的数组数据
+	u8 j=0;
+	while (chr[j]!='\0')
+	{		
+		OLED_ShowChar(x,y,chr[j++],sizey);
+		if(sizey==8)x+=6;
+		else x+=sizey/2;
 	}
 }
-
-/*这个是oled显示图片函数*/
-void oled_ShowBMP(unsigned char x0,unsigned char y0,unsigned char x1,unsigned char y1,unsigned char BMP[])
+//显示汉字
+void OLED_ShowChinese(u8 x,u8 y,u8 no,u8 sizey)
 {
-	int j=0;
-	unsigned char x,y;
-	if(y1%8 == 0)y=y1/8;//判断是否刚好一页
-	else y=y1/8+1;//不是的话就再加一页
-	
-	for(y = y0;y < y1;y++)//循环页数
+	u16 i,size1=(sizey/8+((sizey%8)?1:0))*sizey;
+	for(i=0;i<size1;i++)
 	{
-		oled_SetPos(x0,y);//设置开始位置x0，y
-		for(x = x0;x < x1; x++)//循环列数
-		{
-			oled_IIC_SendData(BMP[j++]);//发送图片数据
+		if(i%sizey==0) OLED_Set_Pos(x,y++);
+		if(sizey==16) OLED_WR_Byte(Hzk[no][i],OLED_DATA);//16x16字号
+//		else if(sizey==xx) OLED_WR_Byte(xxx[c][i],OLED_DATA);//用户添加字号
+		else return;
+	}				
+}
+
+
+//显示图片
+//x,y显示坐标
+//sizex,sizey,图片长宽
+//BMP：要显示的图片
+void OLED_DrawBMP(u8 x,u8 y,u8 sizex, u8 sizey,u8 BMP[])
+{ 	
+  u16 j=0;
+	u8 i,m;
+	sizey=sizey/8+((sizey%8)?1:0);
+	for(i=0;i<sizey;i++)
+	{
+		OLED_Set_Pos(x,i+y);
+    for(m=0;m<sizex;m++)
+		{      
+			OLED_WR_Byte(BMP[j++],OLED_DATA);	    	
 		}
 	}
+} 
+
+
+
+//初始化				    
+void OLED_Init(void)
+{
+	OLED_RES_Clr();
+  delay_ms(200);
+	OLED_RES_Set();
 	
+	OLED_WR_Byte(0xAE,OLED_CMD);//--turn off oled panel
+	OLED_WR_Byte(0x00,OLED_CMD);//---set low column address
+	OLED_WR_Byte(0x10,OLED_CMD);//---set high column address
+	OLED_WR_Byte(0x40,OLED_CMD);//--set start line address  Set Mapping RAM Display Start Line (0x00~0x3F)
+	OLED_WR_Byte(0x81,OLED_CMD);//--set contrast control register
+	OLED_WR_Byte(0xCF,OLED_CMD); // Set SEG Output Current Brightness
+	OLED_WR_Byte(0xA1,OLED_CMD);//--Set SEG/Column Mapping     0xa0左右反置 0xa1正常
+	OLED_WR_Byte(0xC8,OLED_CMD);//Set COM/Row Scan Direction   0xc0上下反置 0xc8正常
+	OLED_WR_Byte(0xA6,OLED_CMD);//--set normal display
+	OLED_WR_Byte(0xA8,OLED_CMD);//--set multiplex ratio(1 to 64)
+	OLED_WR_Byte(0x3f,OLED_CMD);//--1/64 duty
+	OLED_WR_Byte(0xD3,OLED_CMD);//-set display offset	Shift Mapping RAM Counter (0x00~0x3F)
+	OLED_WR_Byte(0x00,OLED_CMD);//-not offset
+	OLED_WR_Byte(0xd5,OLED_CMD);//--set display clock divide ratio/oscillator frequency
+	OLED_WR_Byte(0x80,OLED_CMD);//--set divide ratio, Set Clock as 100 Frames/Sec
+	OLED_WR_Byte(0xD9,OLED_CMD);//--set pre-charge period
+	OLED_WR_Byte(0xF1,OLED_CMD);//Set Pre-Charge as 15 Clocks & Discharge as 1 Clock
+	OLED_WR_Byte(0xDA,OLED_CMD);//--set com pins hardware configuration
+	OLED_WR_Byte(0x12,OLED_CMD);
+	OLED_WR_Byte(0xDB,OLED_CMD);//--set vcomh
+	OLED_WR_Byte(0x40,OLED_CMD);//Set VCOM Deselect Level
+	OLED_WR_Byte(0x20,OLED_CMD);//-Set Page Addressing Mode (0x00/0x01/0x02)
+	OLED_WR_Byte(0x02,OLED_CMD);//
+	OLED_WR_Byte(0x8D,OLED_CMD);//--set Charge Pump enable/disable
+	OLED_WR_Byte(0x14,OLED_CMD);//--set(0x10) disable
+	OLED_WR_Byte(0xA4,OLED_CMD);// Disable Entire Display On (0xa4/0xa5)
+	OLED_WR_Byte(0xA6,OLED_CMD);// Disable Inverse Display On (0xa6/a7) 
+	OLED_Clear();
+	OLED_WR_Byte(0xAF,OLED_CMD); /*display ON*/ 
 }
+
+
+
+

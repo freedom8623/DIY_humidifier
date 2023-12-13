@@ -1,1 +1,0 @@
-"Driver\font.c" OPTIMIZE (8,SPEED) BROWSE INCDIR(.\Driver;.\User) DEBUG OBJECTEXTEND PRINT(.\Listings\font.lst) TABS (2) OBJECT(.\Objects\font.obj)

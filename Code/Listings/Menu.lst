@@ -1,0 +1,322 @@
+C51 COMPILER V9.60.7.0   MENU                                                              12/13/2023 13:19:16 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MENU
+OBJECT MODULE PLACED IN .\Objects\Menu.obj
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE Driver\Menu.c LARGE WARNINGLEVEL(1) OPTIMIZE(8,SPEED) BROWSE INCDIR(.\Dr
+                    -iver;.\User) DEBUG OBJECTEXTEND PRINT(.\Listings\Menu.lst) TABS(2) OBJECT(.\Objects\Menu.obj)
+
+line level    source
+
+   1          #include "Menu.h"
+   2          //∞¥º¸
+   3          struct keys key[];
+   4          
+   5          void (*current_operation_index)(); //≤Ÿ◊˜∫Ø ˝÷∏’Î
+   6          unsigned int  func_index = 0;//ªÒ»°À˜“˝÷µ
+   7          //Œ¬∂»
+   8          unsigned char rec_dat[9] = {'0','0','0','0','0','0','0','0','0'}; //¥¢¥Ê ˝æ›
+   9          
+  10          //========≤Àµ•========================
+  11          
+  12          
+  13          uchar showtext[16];
+  14          uchar showtext2[16];
+  15          //currentÀ˜“˝  enter»∑∂® ≥§∞¥Ω¯»Î≤Àµ• nextœ¬“ª∏ˆ +   last…œ“ª∏ˆ -  back∑µªÿ ≥§∞¥πÿ±’≈ÁŒÌ
+  16          
+  17          Menu_table  table[29]=
+  18          {
+  19            //“ªº∂
+  20            {0, 1, 0, 0,  0,(*Page0)},//  Ω¯»Î“ªº∂≤Àµ•
+  21            
+  22            {1, 3, 2, 2,  0,(*Page1)},//“ªº∂ΩÁ√Ê£®…Ë÷√£©£∫“ªº∂ΩÁ√Ê—°‘Òµ⁄“ª––
+  23            {2, 4, 1, 1,  0,(*Page2)},//“ªº∂ΩÁ√Ê—°‘Òµ⁄∂˛––
+  24            
+  25            {3, 5, 3, 3,  1,(*Page3)},//∂˛º∂ΩÁ√Ê
+  26            {4, 6, 4, 4,  2,(*Page4)},//∂˛º∂ΩÁ√Ê
+  27            
+  28            {5, 0, 3, 3,  3,(*Page5)},//≥…π¶œ‘ æ
+  29            {6, 0, 4, 4,  4,(*Page6)},//≥…π¶œ‘ æ
+  30            
+  31            
+  32          
+  33            
+  34          };
+  35          void Page0(void)
+  36          {
+  37   1          OLED_ShowString(0,0,"=======0^0======",16);  /*µ⁄“ª∏ˆ≤Œ ˝ «Xøÿ÷∆◊Û”“Œª÷√…Ë÷√Œ™8/Œª£¨µ⁄∂˛∏ˆ≤Œ ˝ «Y…œœ¬2/Œ
+             -ª*/
+  38   1          OLED_ShowString(0,2,"||",16);OLED_ShowString(112,2,"||",16);
+  39   1          OLED_ShowString(0,2,"||",16);OLED_ShowString(112,2,"||",16);
+  40   1          OLED_ShowString(0,4,"||",16);OLED_ShowString(112,4,"||",16);
+  41   1          OLED_ShowString(0,4,"||",16);OLED_ShowString(112,4,"||",16);
+  42   1          OLED_ShowString(0,6,"||",16);OLED_ShowString(112,6,"||",16);
+  43   1          OLED_ShowString(0,6,"||",16);OLED_ShowString(112,6,"||",16);
+  44   1        
+  45   1        
+  46   1          OLED_ShowChinese(32,2,4,16);/* ™∂»*/
+  47   1          OLED_ShowChinese(48,2,5,16);
+  48   1          sprintf(showtext,":%c%c%",rec_dat[0],rec_dat[1]);
+  49   1          OLED_ShowString(64,2,showtext,16);
+  50   1          
+  51   1          OLED_ShowChinese(32,4,8,16);/*ÀÆŒª*/
+  52   1          OLED_ShowChinese(48,4,9,16);
+  53   1          OLED_ShowString(64,4,":",16);
+C51 COMPILER V9.60.7.0   MENU                                                              12/13/2023 13:19:16 PAGE 2   
+
+  54   1          OLED_ShowChinese(80,4,13,16);/*°¡*/
+  55   1        
+  56   1          //sprintf(showtext2,":%c%c  ",rec_dat[4],rec_dat[5]);
+  57   1          //OLED_ShowString(64,4,showtext2,16);
+  58   1        
+  59   1          OLED_ShowChinese(32,6,10,16);/*ŒÌªØ*/
+  60   1          OLED_ShowChinese(48,6,11,16);
+  61   1          OLED_ShowString(64,6,":",16);
+  62   1          OLED_ShowChinese(80,6,12,16);/*°Ã*/
+  63   1      }
+  64          
+  65          void Page1(void)
+  66          {
+  67   1          OLED_ShowChinese(48,0,6,16); /*…Ë÷√*/
+  68   1          OLED_ShowChinese(64,0,7,16); /*…Ë÷√*/
+  69   1          OLED_ShowString(0,0,"======",16);OLED_ShowString(80,0,"=====",16);
+  70   1        
+  71   1          OLED_ShowString(0,2,">",16);
+  72   1          OLED_ShowChinese(16,2,6,16); /*…Ë÷√*/
+  73   1          OLED_ShowChinese(32,2,7,16); 
+  74   1          OLED_ShowChinese(48,2,4,16);/* ™∂»*/
+  75   1          OLED_ShowChinese(64,2,5,16);
+  76   1      
+  77   1          
+  78   1          OLED_ShowChinese(16,4,6,16); /*…Ë÷√*/
+  79   1          OLED_ShowChinese(32,4,7,16); 
+  80   1          OLED_ShowChinese(48,4,0,16);/* ™∂»*/
+  81   1          OLED_ShowChinese(64,4,1,16);
+  82   1        
+  83   1      }
+  84          
+  85          void Page2(void)
+  86          {
+  87   1          OLED_ShowChinese(48,0,6,16); /*…Ë÷√*/
+  88   1          OLED_ShowChinese(64,0,7,16); /*…Ë÷√*/
+  89   1          OLED_ShowString(0,0,"======",16);OLED_ShowString(80,0,"=====",16);
+  90   1        
+  91   1          
+  92   1          OLED_ShowChinese(16,2,6,16); /*…Ë÷√*/
+  93   1          OLED_ShowChinese(32,2,7,16); 
+  94   1          OLED_ShowChinese(48,2,4,16);/* ™∂»*/
+  95   1          OLED_ShowChinese(64,2,5,16);
+  96   1      
+  97   1          OLED_ShowString(0,4,">",16);
+  98   1          OLED_ShowChinese(16,4,6,16); /*…Ë÷√*/
+  99   1          OLED_ShowChinese(32,4,7,16); 
+ 100   1          OLED_ShowChinese(48,4,0,16);/*µ∆π‚*/
+ 101   1          OLED_ShowChinese(64,4,1,16);
+ 102   1        
+ 103   1      }
+ 104          //int setting_humit = 0;
+ 105          int limit_humit = 100;
+ 106          
+ 107          void Page3(void)
+ 108          {
+ 109   1          OLED_ShowChinese(48,0,6,16); /*…Ë÷√*/
+ 110   1          OLED_ShowChinese(64,0,7,16); /*…Ë÷√*/
+ 111   1          OLED_ShowString(0,0,"======",16);OLED_ShowString(80,0,"=====",16);
+ 112   1        
+ 113   1          
+ 114   1          OLED_ShowChinese(16,2,14,16); /*…Ë÷√*/
+ 115   1          OLED_ShowChinese(32,2,15,16); 
+C51 COMPILER V9.60.7.0   MENU                                                              12/13/2023 13:19:16 PAGE 3   
+
+ 116   1          OLED_ShowChinese(48,2,4,16);/* ™∂»*/
+ 117   1          OLED_ShowChinese(64,2,5,16);
+ 118   1        
+ 119   1            sprintf(showtext,":%03d%",limit_humit);
+ 120   1          OLED_ShowString(80,2,showtext,16);
+ 121   1        
+ 122   1      
+ 123   1        
+ 124   1        
+ 125   1      }
+ 126          
+ 127          int light_mode = 0;
+ 128          void Page4(void)
+ 129          {
+ 130   1          OLED_ShowChinese(48,0,6,16); /*…Ë÷√*/
+ 131   1          OLED_ShowChinese(64,0,7,16); /*…Ë÷√*/
+ 132   1          OLED_ShowString(0,0,"======",16);OLED_ShowString(80,0,"=====",16);
+ 133   1        
+ 134   1          
+ 135   1          OLED_ShowChinese(16,2,14,16); /*…Ë÷√*/
+ 136   1          OLED_ShowChinese(32,2,15,16); 
+ 137   1          OLED_ShowChinese(48,2,0,16);/*≥…π¶*/
+ 138   1          OLED_ShowChinese(64,2,1,16);
+ 139   1        
+ 140   1          sprintf(showtext,":%03d%",light_mode);
+ 141   1          OLED_ShowString(80,2,showtext,16);
+ 142   1      
+ 143   1        
+ 144   1        
+ 145   1      }
+ 146          
+ 147          
+ 148          void Page5(void)
+ 149          {
+ 150   1          OLED_ShowChinese(48,0,6,16); /*…Ë÷√*/
+ 151   1          OLED_ShowChinese(64,0,7,16); /*…Ë÷√*/
+ 152   1          OLED_ShowString(0,0,"======",16);OLED_ShowString(80,0,"=====",16);
+ 153   1        
+ 154   1          
+ 155   1          OLED_ShowChinese(16,4,6,16); /*…Ë÷√*/
+ 156   1          OLED_ShowChinese(32,4,7,16); 
+ 157   1          OLED_ShowChinese(48,4,16,16);/*≥…π¶*/
+ 158   1          OLED_ShowChinese(64,4,17,16);
+ 159   1      
+ 160   1          OLED_ShowString(80,4,"^-^",16);
+ 161   1      
+ 162   1        
+ 163   1        
+ 164   1        
+ 165   1      }
+ 166          //int setting_light = 0;
+ 167          
+ 168          void Page6(void)
+ 169          {
+ 170   1          OLED_ShowChinese(48,0,6,16); /*…Ë÷√*/
+ 171   1          OLED_ShowChinese(64,0,7,16); /*…Ë÷√*/
+ 172   1          OLED_ShowString(0,0,"======",16);OLED_ShowString(80,0,"=====",16);
+ 173   1        
+ 174   1          
+ 175   1          OLED_ShowChinese(16,4,6,16); /*…Ë÷√*/
+ 176   1          OLED_ShowChinese(32,4,7,16); 
+ 177   1          OLED_ShowChinese(48,4,16,16);/*≥…π¶*/
+C51 COMPILER V9.60.7.0   MENU                                                              12/13/2023 13:19:16 PAGE 4   
+
+ 178   1          OLED_ShowChinese(64,4,17,16);
+ 179   1        
+ 180   1          
+ 181   1          OLED_ShowString(80,4,"^-^",16);
+ 182   1      
+ 183   1        
+ 184   1        
+ 185   1      }
+ 186          
+ 187          
+ 188          
+ 189          char key_long_count = 0;
+ 190          char key_dowm =0;
+ 191          char key_old;
+ 192          //∞¥º¸¥¶¿Ì
+ 193          char key_count = 0;
+ 194          void Key_Proc(void)
+ 195          {
+ 196   1      //  if(key[0].longkey_flag == 1)//Ω¯»Î…Ë÷√0 »∑∂®1;
+ 197   1      //  { 
+ 198   1      //    key_long_count ^= 1;
+ 199   1      //    key_old = key_long_count;
+ 200   1      //    if(key_old&&key_long_count==0)
+ 201   1      //    {
+ 202   1      //        key_dowm =1;
+ 203   1      //    }else
+ 204   1      //    {
+ 205   1      //        key_dowm=0;
+ 206   1      //    }
+ 207   1      //==============================================    
+ 208   1      //  if(key_dowm==1)
+ 209   1      //  {
+ 210   1          if(key[0].single_flag == 1)//∞¥º¸SW1 ∂Ã∞¥
+ 211   1        { //key_count++;
+ 212   2          //if(key_count==1)
+ 213   2          //{
+ 214   2          func_index=table[func_index].enter;//ªÒ»°enterÀ˜“˝∫≈
+ 215   2          //}
+ 216   2            OLED_Clear();
+ 217   2          key[0].single_flag = 0;
+ 218   2        }
+ 219   1      
+ 220   1        
+ 221   1      //    key_long_count++;
+ 222   1      //    if(key_long_count == 1)
+ 223   1      //    {
+ 224   1      
+ 225   1      //  
+ 226   1      //    }
+ 227   1      //    if£®key_long_count ==2£©{
+ 228   1      //    key_long_count=0£ª
+ 229   1      //    func_index=table[func_index].enter;
+ 230   1      //    }
+ 231   1            
+ 232   1          
+ 233   1          //key[0].longkey_flag = 0;
+ 234   1            
+ 235   1        //}
+ 236   1      //==============================================      
+ 237   1         if(key[1].single_flag == 1)//œÚ…œ
+ 238   1        {
+ 239   2            func_index=table[func_index].next;//ªÒ»°nextÀ˜“˝∫≈
+C51 COMPILER V9.60.7.0   MENU                                                              12/13/2023 13:19:16 PAGE 5   
+
+ 240   2      //      if(func_index == 3)
+ 241   2      //      {
+ 242   2      //        limit_humit++;
+ 243   2      //      }
+ 244   2          
+ 245   2            OLED_Clear();
+ 246   2            
+ 247   2            key[1].single_flag = 0;
+ 248   2        
+ 249   2        }
+ 250   1      //==============================================  
+ 251   1         if(key[2].single_flag == 1)//œÚœ¬
+ 252   1         {
+ 253   2          func_index=table[func_index].last;//ªÒ»°lastÀ˜“˝∫≈
+ 254   2      //      if(func_index == 3)
+ 255   2      //      {
+ 256   2      //        limit_humit++;
+ 257   2      //      } 
+ 258   2           
+ 259   2          OLED_Clear();
+ 260   2          key[2].single_flag = 0;
+ 261   2        
+ 262   2        }
+ 263   1      //==============================================    
+ 264   1        if(key[3].single_flag == 1)//πÿ±’
+ 265   1        {
+ 266   2          func_index=table[func_index].back;//ªÒ»°lastÀ˜“˝∫≈
+ 267   2          OLED_Clear();
+ 268   2          
+ 269   2          key[3].single_flag = 0;
+ 270   2        
+ 271   2        }
+ 272   1        if(key[3].longkey_flag == 1)//≥§∞¥πÿ±’ŒÌªØ∆˜;
+ 273   1        {
+ 274   2            
+ 275   2            key[3].longkey_flag = 0;
+ 276   2        
+ 277   2        }
+ 278   1         current_operation_index=table[func_index].current_operation;//÷¥––µ±«∞À˜“˝∫≈À˘∂‘”¶µƒπ¶ƒ‹∫Ø ˝°£
+ 279   1        (*current_operation_index)();
+ 280   1      //}
+ 281   1      }
+ 282          
+ 283          
+ 284          
+ 285          
+ 286          
+ 287          
+ 288          
+ 289          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1789    ----
+   CONSTANT SIZE    =     55    ----
+   XDATA SIZE       =    286    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,1 @@
+"Driver\Menu.c" LARGE WARNINGLEVEL (1) OPTIMIZE (8,SPEED) BROWSE INCDIR(.\Driver;.\User) DEBUG OBJECTEXTEND PRINT(.\Listings\Menu.lst) TABS (2) OBJECT(.\Objects\Menu.obj)

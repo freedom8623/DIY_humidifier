@@ -1,12 +1,13 @@
 ".\Objects\STARTUP.obj",
 ".\Objects\main.obj",
 ".\Objects\Timer.obj",
+".\Objects\interrupt.obj",
 ".\Objects\Gpio.obj",
-".\Objects\DHT.obj",
 ".\Objects\Pwm.obj",
-".\Objects\delay.obj",
-".\Objects\font.obj",
-".\Objects\iic.obj",
-".\Objects\oled.obj" 
+".\Objects\DHT.obj",
+".\Objects\oled.obj",
+".\Objects\ws2812b.obj",
+".\Objects\Menu.obj",
+".\Objects\Buzzer.obj" 
 TO ".\Objects\humidifier" 
 PRINT(".\Listings\humidifier.m51") RAMSIZE(256) 

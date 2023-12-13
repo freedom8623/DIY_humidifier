@@ -1,106 +1,166 @@
-C51 COMPILER V9.60.7.0   DHT                                                               12/04/2023 15:46:04 PAGE 1   
+C51 COMPILER V9.60.7.0   DHT                                                               12/13/2023 11:29:08 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE DHT
 OBJECT MODULE PLACED IN .\Objects\DHT.obj
-COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE Driver\DHT.c OPTIMIZE(8,SPEED) BROWSE INCDIR(.\Driver;.\User) DEBUG OBJE
-                    -CTEXTEND PRINT(.\Listings\DHT.lst) TABS(2) OBJECT(.\Objects\DHT.obj)
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE Driver\DHT.c LARGE WARNINGLEVEL(1) OPTIMIZE(8,SPEED) BROWSE INCDIR(.\Dri
+                    -ver;.\User) DEBUG OBJECTEXTEND PRINT(.\Listings\DHT.lst) TABS(2) OBJECT(.\Objects\DHT.obj)
 
 line level    source
 
-   1          #include "DHT.h"
-   2          
-   3          
-   4          //单总线传输
-   5          //延时函数
-   6          
-   7          
-   8          void Delay20ms()    //@24.000MHz
-   9          {
-  10   1        unsigned char i, j, k;
-  11   1      
-  12   1        _nop_();
-  13   1        _nop_();
-  14   1        i = 2;
-  15   1        j = 211;
-  16   1        k = 231;
-  17   1        do
-  18   1        {
-  19   2          do
-  20   2          {
-  21   3            while (--k);
-  22   3          } while (--j);
-  23   2        } while (--i);
-  24   1      }
-  25          void Delay40us()    //@24.000MHz
-  26          {
+   1          #include "DHT.H"
+   2          #include "Intrins.H"
+   3          #include "oled.H"
+   4          
+   5          
+   6          void Delay25ms()    //@24.000MHz
+   7          {
+   8   1        unsigned char i, j, k;
+   9   1      
+  10   1        _nop_();
+  11   1        _nop_();
+  12   1        i = 4;
+  13   1        j = 12;
+  14   1        k = 50;
+  15   1        do
+  16   1        {
+  17   2          do
+  18   2          {
+  19   3            while (--k);
+  20   3          } while (--j);
+  21   2        } while (--i);
+  22   1      }
+  23          
+  24          void DHT11_delay_us(uchar n)
+  25          {
+  26   1      
   27   1        unsigned char i;
   28   1      
-  29   1        _nop_();
-  30   1        _nop_();
-  31   1        i = 237;
-  32   1        while (--i);
-  33   1      }
-  34          
-  35          
-  36          
-  37          
-  38          char datas[5];    //数组分别代表，湿度，湿度小数，温度，温度小数，校验
-  39          //初始化模块（检测模块是否存在）每次传输数据都要初始化
-  40          void DHT_Start()
-  41          {
-  42   1        
-  43   1          DHT = 1;    //对应初始化时序start
-  44   1          DHT = 0;
-  45   1          Delay20ms();
-  46   1          DHT=1;
-  47   1          while(DHT);
-  48   1          while(!DHT);
-  49   1          while(DHT);
-  50   1      
-  51   1      }
-  52          
-  53          void DHT11_Read()
-  54          {
-C51 COMPILER V9.60.7.0   DHT                                                               12/04/2023 15:46:04 PAGE 2   
+  29   1        while(n--)
+  30   1        {
+  31   2        i = 6;
+  32   2        while (--i);
+  33   2          
+  34   2        }
+  35   1      
+  36   1      }
+  37          void DHT11_delay_ms(uint z)
+  38          {
+  39   1         unsigned char i, j;
+  40   1        
+  41   1        while(z--)
+  42   1        {
+  43   2      
+  44   2          _nop_();
+  45   2        i = 32;
+  46   2        j = 40;
+  47   2        do
+  48   2        {
+  49   3          while (--j);
+  50   3        } while (--i);
+  51   2        
+  52   2        }
+  53   1      }
+  54          
+C51 COMPILER V9.60.7.0   DHT                                                               12/13/2023 11:29:08 PAGE 2   
 
-  55   1        char value = 0;
-  56   1        char flag;
-  57   1        char i = 0;
-  58   1        char j = 0;
-  59   1        DHT_Start();
-  60   1        for(j = 0;j<5;j++)//分别读取五组数据
-  61   1        {     
-  62   2          for(i=0;i<8;i++)//每组八位分别处理
-  63   2          {   
-  64   3            while(!DHT);    //高电平开始计时
-  65   3            Delay40us();
-  66   3            if(DHT == 1)  //如果还为高则是“1”
-  67   3            {   
-  68   4              flag = 1;
-  69   4              while(DHT);
-  70   4            }
-  71   3             else       //否则“0”
-  72   3            {       
-  73   4              flag = 0;
-  74   4            }
-  75   3            value = value << 1;   //移位
-  76   3            value |= flag;      //赋值
-  77   3          }
-  78   2          datas[j] = value;     //赋值
-  79   2        }
-  80   1      
-  81   1      }
-  82          
-  83          
+  55          /*
+  56          主机（单片机）发送起始信号：
+  57          1.主机先拉高data。
+  58          2.拉低data延迟18ms。
+  59          3.拉高data并延迟等待（通过此操作将单片机引脚设置为输入）。
+  60          */
+  61          void DHT11_start()
+  62          {
+  63   1         DHT=1;
+  64   1         DHT11_delay_us(2);
+  65   1         DHT=0;
+  66   1         DHT11_delay_ms(25);   //拉低延时18ms以上;
+  67   1         DHT=1;
+  68   1         DHT11_delay_us(30);   //拉高 延时 20~40us，取中间值 30us
+  69   1      }
+  70          
+  71          /*------------------------------------------------
+  72                        接收八位二进制
+  73          ------------------------------------------------*/
+  74          uchar DHT11_rec_byte()      //接收一个字节
+  75          {
+  76   1        unsigned char i,dat=0;
+  77   1        for(i=0;i<8;i++)    //从高到低依次接收8位数据
+  78   1         {          
+  79   2            while(DHT);   //等待进入低电平
+  80   2            while(!DHT);   //等待50us低电平过去
+  81   2            DHT11_delay_us(32);     //延时60us，如果还为高则数据为1，否则为0 
+  82   2            dat<<=1;//移位（低位补零）使正确接收8位数据，数据为0时直接移位
+  83   2            if(DHT==1)    //数据为1时，使dat加1来接收数据1
+  84   2              dat+=1;
+  85   2            while(DHT);  //等待数据线拉低    
+  86   2         }  
+  87   1          return dat;
+  88   1      }
+  89          
+  90          
+  91          /*------------------------------------------------
+  92                        接收40bit数据（具体的温湿度）
+  93          1.主机先把data线拉高（io设置为输入）。
+  94          2.从机把data线拉低，主机读取data线电平，直到低电平结束（大约50us）
+  95            从机拉高data线后，延迟40us左右（28~70us之间）主机再次读取data线电平，如果为低电平，则为“0”，如果为高电
+             -平，则为“1”。
+  96          3.继续重复上述1,2步骤累计40次。
+  97          ------------------------------------------------*/
+  98          uchar T_H;
+  99          void DHT11_receive()      //接收40位的数据
+ 100          {
+ 101   1          uchar R_H,R_L,T_L,RH,RL,TH,TL,revise; 
+ 102   1          DHT11_start();//发送起始信号：
+ 103   1        
+ 104   1        
+ 105   1          if(DHT==0)
+ 106   1          {
+ 107   2              while(DHT==0);   //等待拉高     
+ 108   2              DHT11_delay_us(40);  //拉高后延时80us
+ 109   2            
+ 110   2              R_H=DHT11_rec_byte();    //接收湿度高八位  
+ 111   2              R_L=DHT11_rec_byte();    //接收湿度低八位  
+ 112   2              T_H=DHT11_rec_byte();    //接收温度高八位  
+ 113   2              T_L=DHT11_rec_byte();    //接收温度低八位
+ 114   2              revise=DHT11_rec_byte(); //接收校正位
+ 115   2      
+C51 COMPILER V9.60.7.0   DHT                                                               12/13/2023 11:29:08 PAGE 3   
+
+ 116   2              DHT11_delay_us(25);    //结束
+ 117   2      
+ 118   2              if((R_H+R_L+T_H+T_L)==revise)      //最后一字节为校验位，校验是否正确
+ 119   2              {
+ 120   3                  RH=R_H;
+ 121   3                  RL=R_L;
+ 122   3                  TH=T_H;
+ 123   3                  TL=T_L;
+ 124   3              } 
+ 125   2              
+ 126   2              /*数据处理，转换为字符，方便显示*/
+ 127   2              //湿度
+ 128   2              rec_dat[0]='0'+(RH/10);
+ 129   2              rec_dat[1]='0'+(RH%10);
+ 130   2              rec_dat[2]=' ';
+ 131   2              rec_dat[3]=' ';
+ 132   2              
+ 133   2              //温度
+ 134   2              rec_dat[4]='0'+(TH/10);
+ 135   2              rec_dat[5]='0'+(TH%10); 
+ 136   2              rec_dat[6]=' ';
+ 137   2            
+ 138   2          }
+ 139   1      
+ 140   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =     91    ----
+   CODE SIZE        =    291    ----
    CONSTANT SIZE    =   ----    ----
-   XDATA SIZE       =   ----    ----
+   XDATA SIZE       =      1       5
    PDATA SIZE       =   ----    ----
-   DATA SIZE        =      5    ----
+   DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
 END OF MODULE INFORMATION.

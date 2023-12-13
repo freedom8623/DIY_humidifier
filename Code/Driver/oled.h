@@ -1,26 +1,52 @@
-#ifndef _OLED_H
-#define _OLED_H
+#ifndef __OLED_H
+#define __OLED_H
 
-#include "iic.h"
-#include "delay.h"
-#include "font.h"
-#include "stc8h.h"       //包含此头文件后，不需要再包含"reg51.h"头文件
+#include <STC8H.H>      //包含此头文件后，不需要再包含"reg51.h"头文件  	 
+ 
+#define  u8 unsigned char 
+#define  u16 unsigned int
+
+//#define  u32 unsigned int
+	
+#define OLED_CMD  0	//写命令
+#define OLED_DATA 1	//写数据
+
+sbit OLED_SCL=P1^5;//SCL
+sbit OLED_SDA=P1^4;//SDA
+sbit OLED_RES =P1^2;//RES
+
+//-----------------OLED端口定义----------------
+
+#define OLED_SCL_Clr() OLED_SCL=0
+#define OLED_SCL_Set() OLED_SCL=1
+
+#define OLED_SDA_Clr() OLED_SDA=0
+#define OLED_SDA_Set() OLED_SDA=1
+
+#define OLED_RES_Clr() OLED_RES=0
+#define OLED_RES_Set() OLED_RES=1
 
 
-void oled_IIC_SendCommand(unsigned char IIC_Command);//写命令
-void oled_IIC_SendData(unsigned char IIC_Data);//写数据
-void oled_Init(void);//OLED初始化
-void oled_Display_ON(void);//开显示
-void oled_Display_OFF(void);//关显示
-void oled_Allfill(unsigned char fill_Data);//填充全部区域
-void oled_clear(void);//清除显示
-void oled_SetPos(unsigned char x,unsigned char y);//设置起始点坐标
 
-unsigned int oled_Pow(unsigned char m,unsigned char n);//计算m^n
-void oled_ShowNum(unsigned char x,unsigned char y,int num,unsigned char len,unsigned char size);//显示数字
-void oled_ShowChar(unsigned char x,unsigned char y,unsigned char ch,unsigned char size);//显示字符
-void oled_ShowStr(unsigned char x,unsigned char y,const unsigned char *p,unsigned char size);//显示字符串
-void oled_ShowCN(unsigned char x,unsigned char y,unsigned char bit_temp);//显示汉字
-void oled_ShowBMP(unsigned char x0,unsigned char y0,unsigned char x1,unsigned char y1,unsigned char BMP[]);//显示图片
+//OLED控制用函数
+void delay_ms(unsigned int ms);
+void OLED_ColorTurn(u8 i);
+void OLED_DisplayTurn(u8 i);
+void OLED_WR_Byte(u8 dat,u8 cmd);
+void OLED_Set_Pos(u8 x, u8 y);
+void OLED_Display_On(void);
+void OLED_Display_Off(void);
+void OLED_Clear(void);
+void OLED_ShowChar(u8 x,u8 y,u8 chr,u8 sizey);
+unsigned int oled_pow(u8 m,u8 n);
+void OLED_ShowNum(u8 x,u8 y,unsigned int num,u8 len,u8 sizey);
+void OLED_ShowString(u8 x,u8 y,u8 *chr,u8 sizey);
+void OLED_ShowChinese(u8 x,u8 y,u8 no,u8 sizey);
+void OLED_DrawBMP(u8 x,u8 y,u8 sizex,u8 sizey,u8 BMP[]);
+void OLED_Init(void);
 
-#endif
+#endif  
+	 
+
+
+

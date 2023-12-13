@@ -1,0 +1,126 @@
+C51 COMPILER V9.60.7.0   INTERRUPT                                                         12/13/2023 13:03:18 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE INTERRUPT
+OBJECT MODULE PLACED IN .\Objects\interrupt.obj
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE User\interrupt.c LARGE WARNINGLEVEL(1) OPTIMIZE(8,SPEED) BROWSE INCDIR(.
+                    -\Driver;.\User) DEBUG OBJECTEXTEND PRINT(.\Listings\interrupt.lst) TABS(2) OBJECT(.\Objects\interrupt.obj)
+
+line level    source
+
+   1          #include "interrupt.h"
+   2          #include "Menu.h"
+   3          //定时器2中断主要用于系统时钟
+   4          //定时器1ns
+   5          
+   6          
+   7          void timer2_int (void) interrupt 12
+   8          {
+   9   1        uchar i = 0;
+  10   1        T_Tick ++;
+  11   1        if(T_Tick>10000) T_Tick = 0;
+  12   1      
+  13   1      
+  14   1      }
+  15          
+  16          //定时器3中断主要用于按键中断
+  17          
+  18          
+  19          struct keys key[4] = {0,0,0};
+  20          uchar Key_T = 0;
+  21          
+  22          //按键引脚定义
+  23          sbit KEY1 = P3^2;
+  24          sbit KEY2 = P3^3;
+  25          sbit KEY3 = P3^4;
+  26          sbit KEY4 = P3^5;
+  27          
+  28          void timer3_int(void) interrupt 19
+  29          {
+  30   1        uchar i;
+  31   1        Key_T++;
+  32   1        if(Key_T>=10)
+  33   1        {
+  34   2          Key_T = 0;
+  35   2              //第一步读取按键状态
+  36   2            key[0].key_sta = KEY1;
+  37   2            key[1].key_sta = KEY2;
+  38   2            key[2].key_sta = KEY3;
+  39   2            key[3].key_sta = KEY4;
+  40   2        
+  41   2          //遍历
+  42   2          for(i = 0;i <4; i++)
+  43   2          {
+  44   3            switch(key[i].judge_sta)
+  45   3            {
+  46   4              case 0 :
+  47   4              {
+  48   5                //第一步是为了消抖
+  49   5              if(key[i].key_sta == 0)
+  50   5                {
+  51   6                key[i].judge_sta = 1;
+  52   6                key[i].key_time = 0;
+  53   6                
+  54   6                }
+C51 COMPILER V9.60.7.0   INTERRUPT                                                         12/13/2023 13:03:18 PAGE 2   
+
+  55   5              }
+  56   4                break;
+  57   4                
+  58   4              case 1 :
+  59   4              {
+  60   5              //如果key_sta == 0证明按键确实被按下
+  61   5              if(key[i].key_sta == 0)
+  62   5                {
+  63   6                  key[i].judge_sta = 2;
+  64   6      
+  65   6                }
+  66   5              else
+  67   5                {
+  68   6                key[i].judge_sta = 0;
+  69   6                }
+  70   5              }
+  71   4              break;
+  72   4                        
+  73   4              case 2 :
+  74   4              {
+  75   5                //证明按下后松手
+  76   5                  if(key[i].key_sta == 1)
+  77   5                {
+  78   6                  key[i].judge_sta = 0;
+  79   6                      //确定是否为短按
+  80   6                  if(key[i].key_time<=70)
+  81   6                    {
+  82   7                    key[i].single_flag = 1;
+  83   7                    }
+  84   6                  
+  85   6                }
+  86   5                  else
+  87   5                {
+  88   6                  key[i].key_time++;
+  89   6                  //判断如果按下时间大于70ms长按标志位置为1
+  90   6                  if(key[i].key_time>70)
+  91   6                    key[i].longkey_flag = 1;
+  92   6                }
+  93   5              }
+  94   4              break;
+  95   4                        
+  96   4            }       
+  97   3          }
+  98   2        
+  99   2        }
+ 100   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    479    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =     33       1
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

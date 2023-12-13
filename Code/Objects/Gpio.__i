@@ -1,1 +1,1 @@
-"Driver\Gpio.c" OPTIMIZE (8,SPEED) BROWSE INCDIR(.\Driver;.\User) DEBUG OBJECTEXTEND PRINT(.\Listings\Gpio.lst) TABS (2) OBJECT(.\Objects\Gpio.obj)
+"Driver\Gpio.c" LARGE WARNINGLEVEL (1) OPTIMIZE (8,SPEED) BROWSE INCDIR(.\Driver;.\User) DEBUG OBJECTEXTEND PRINT(.\Listings\Gpio.lst) TABS (2) OBJECT(.\Objects\Gpio.obj)
