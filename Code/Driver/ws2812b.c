@@ -27,16 +27,16 @@ void WS_SendData(uchar *_data)
             if (((tmpData>>(7-j)) & 0x01) == 0)
             {
                 LED = 1;
-                _nop_();_nop_();_nop_();_nop_();_nop_();_nop_(); _nop_(); _nop_();
+                _nop_();_nop_();_nop_();_nop_();_nop_();_nop_(); _nop_();_nop_();
                 LED = 0;
                 Delayus(1);      
             }
-            else
+            if(((tmpData>>(7-j)) & 0x01) == 1)
             {
                 LED = 1;
                 Delayus(1);	
                 LED = 0;
-                _nop_();_nop_();_nop_(); _nop_();_nop_();_nop_();_nop_(); _nop_();
+                _nop_();_nop_();_nop_(); _nop_();_nop_();_nop_();_nop_();_nop_();
             }
         }
     }
@@ -44,38 +44,26 @@ void WS_SendData(uchar *_data)
 
 		
 }
-void Delay60us()		//@24.000MHz
+
+void Delay300us()		//@24.000MHz
 {
 	unsigned char i, j;
 
-	_nop_();
-	i = 2;
-	j = 220;
+	i = 10;
+	j = 87;
 	do
 	{
 		while (--j);
 	} while (--i);
 }
-void Delay280us()		//@24.000MHz
-{
-	unsigned char i, j;
 
-	_nop_();
-	_nop_();
-	i = 9;
-	j = 183;
-	do
-	{
-		while (--j);
-	} while (--i);
-}
 
 void Send_offled(void)
 {
-	char OFFValue = {0,0,0};
-	WS_SendData(&OFFValue);	
-
+	EA = 0;
+	//char OFFValue = {0,0,0};
+	//WS_SendData(&OFFValue);		
 	LED = 0;
-	
-	Delay280us();
+	Delay300us();
+	EA = 1;
 }

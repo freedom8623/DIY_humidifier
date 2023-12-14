@@ -1,52 +1,23 @@
 #include "interrupt.h"
-#include "ws2812b.h"
 #include "Menu.h"
 //定时器2中断主要用于系统时钟
 //定时器1ns
-//定时器1ns
-unsigned int new_light_mode;
-int T_Tick;
-char  leddata[] = {000,256,000};
-char  leddata2[] = {256,000,10};
-int water_T = 0;
-extern unsigned int DHT_T;
+
+
 void timer2_int (void) interrupt 12
 {
-//	T_Tick ++;
-//	
-//	if(++water_T == 500) water_T = 0;
-//	if(++DHT_T == 200) DHT_T = 0;
-//	
-//	//WS_SendData(&leddata2);
+	uchar i = 0;
+	T_Tick ++;
+	if(T_Tick>10000) T_Tick = 0;
 
 
-}
-
-
-extern unsigned int Water_Flag;
-
-
-void Alertor(void)
-{
-
-	
-			if(Water_test == 1)
-		{
-			
-//			leddata2[1] = new_light_mode;
-			Water_Flag=1;
-			WS_SendData(&leddata2);		
-		}
-		if(Water_test == 0)
-		{
-			Water_Flag=0;
-			WS_SendData(&leddata);		
-		}
 }
 
 //定时器3中断主要用于按键中断
-struct keys key[4] = {0,0,0};
 
+
+struct keys key[4] = {0,0,0};
+uchar Key_T = 0;
 
 //按键引脚定义
 sbit KEY1 = P3^2;
@@ -57,7 +28,10 @@ sbit KEY4 = P3^5;
 void timer3_int(void) interrupt 19
 {
 	uchar i;
-	
+	Key_T++;
+	if(Key_T>=10)
+	{
+    Key_T = 0;
 	    	//第一步读取按键状态
 			key[0].key_sta = KEY1;
 			key[1].key_sta = KEY2;
@@ -103,25 +77,24 @@ void timer3_int(void) interrupt 19
 					{
 						key[i].judge_sta = 0;
 								//确定是否为短按
-						if(key[i].key_time<=100)
+						if(key[i].key_time<=70)
 							{
 							key[i].single_flag = 1;
 							}
-						}else
-						{
+						
+					}
+						else
+					{
 						key[i].key_time++;
-						}
 						//判断如果按下时间大于70ms长按标志位置为1
-						if(key[i].key_time>100){
+						if(key[i].key_time>70)
 							key[i].longkey_flag = 1;
 					}
-				
-				
+				}
 				break;
-					}
 									
 			}				
-		
+		}
 	
 	}
 }

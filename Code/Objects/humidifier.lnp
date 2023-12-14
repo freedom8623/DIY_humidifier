@@ -6,8 +6,7 @@
 ".\Objects\Pwm.obj",
 ".\Objects\DHT.obj",
 ".\Objects\oled.obj",
-".\Objects\ws2812b.obj",
 ".\Objects\Menu.obj",
-".\Objects\Buzzer.obj" 
+".\Objects\ws2812b.obj" 
 TO ".\Objects\humidifier" 
 PRINT(".\Listings\humidifier.m51") RAMSIZE(256) 

@@ -95,10 +95,15 @@ uchar DHT11_rec_byte()      //接收一个字节
   从机拉高data线后，延迟40us左右（28~70us之间）主机再次读取data线电平，如果为低电平，则为“0”，如果为高电平，则为“1”。
 3.继续重复上述1,2步骤累计40次。
 ------------------------------------------------*/
+unsigned int DHT_T;
 uchar T_H;
 void DHT11_receive()      //接收40位的数据
 {
-    uchar R_H,R_L,T_L,RH,RL,TH,TL,revise; 
+		uchar R_H,R_L,T_L,RH,RL,TH,TL,revise; 
+//		if(DHT_T) return;
+//		DHT_T = 1;
+	
+   
     DHT11_start();//发送起始信号：
 	
 	

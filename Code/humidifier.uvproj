@@ -373,14 +373,14 @@
               <FilePath>.\Driver\oled.c</FilePath>
             </File>
             <File>
-              <FileName>ws2812b.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\ws2812b.c</FilePath>
-            </File>
-            <File>
               <FileName>Menu.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Driver\Menu.c</FilePath>
+            </File>
+            <File>
+              <FileName>ws2812b.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Driver\ws2812b.c</FilePath>
             </File>
           </Files>
         </Group>

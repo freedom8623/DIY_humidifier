@@ -1,0 +1,120 @@
+C51 COMPILER V9.60.7.0   WS2812B2                                                          12/14/2023 11:09:13 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE WS2812B2
+OBJECT MODULE PLACED IN .\Objects\ws2812b2.obj
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE Driver\ws2812b2.c LARGE WARNINGLEVEL(1) OPTIMIZE(8,SPEED) BROWSE INCDIR(
+                    -.\Driver;.\User) DEBUG OBJECTEXTEND PRINT(.\Listings\ws2812b2.lst) TABS(2) OBJECT(.\Objects\ws2812b2.obj)
+
+line level    source
+
+   1          #include "ws2812b2.h"
+*** WARNING C318 IN LINE 6 OF Driver\ws2812b2.h: can't open file 'stdint.h'
+   2          /*
+   3            写 0码 函数
+   4            根据RGB灯手册查得 ：RGB_H 延时 300ns，RGB_L 延时 900ns
+   5            RGB_H，RGB_L之间的延时，根据不同芯片的主频实际调节__nop()函数的个数（以下nop个数未知）    
+   6          */
+   7          
+   8          void delay_ns(unsigned int i)
+   9          {
+  10   1        while (i--)
+  11   1        {
+  12   2          __nop();
+*** WARNING C206 IN LINE 12 OF Driver\ws2812b2.c: '__nop': missing function-prototype
+  13   2        }
+  14   1      }
+  15          void Write0(void)
+  16          {
+  17   1        LED=1;
+  18   1        delay_ns(7);//291ns
+  19   1        
+  20   1        LED=0;
+  21   1        delay_ns(22);//916ns
+  22   1      }
+  23          /*
+  24            写 1码 函数
+  25            根据RGB灯手册查得 ：RGB_H 延时 600ns，RGB_L 延时 600ns
+  26            RGB_H，RGB_L之间的延时，根据不同芯片的主频实际调节__nop()函数的个数   
+  27          */
+  28          void Write1(void)
+  29          {
+  30   1        LED=1;
+  31   1        delay_ns(22);
+  32   1        
+  33   1        LED=0;
+  34   1        delay_ns(7);
+  35   1      }
+  36          
+  37          /*
+  38            写一个字节（8bit）数据
+  39            备  注: RGB的亮度通过更改 0x01 处的值进行调节
+  40          */
+  41          void RGB_WByte(unsigned char byte)
+  42          {
+  43   1        unsigned char i=0;
+  44   1        for(i=0;i<8;i++)
+  45   1        {
+  46   2          if((byte<<i)&0x01)
+  47   2            Write1();
+  48   2          else
+  49   2            Write0();
+  50   2        }
+  51   1      }
+  52          /*
+C51 COMPILER V9.60.7.0   WS2812B2                                                          12/14/2023 11:09:13 PAGE 2   
+
+  53            设置一个RGB灯的色彩
+  54            green red blue，红绿蓝光所占比例大小,范围0~255
+  55            灯亮的顺序为GRB，每种颜色占8位数据，因此一个灯需要写24位数据
+  56          */
+  57          void Write24Bit(unsigned char green, unsigned char red, unsigned char blue)
+  58          {
+  59   1        RGB_WByte(green);
+  60   1        RGB_WByte(red);
+  61   1        RGB_WByte(blue);
+  62   1      }
+  63          ///*
+  64          //  红灯
+  65          //*/
+  66          //void RGB_LED_Red(void)
+  67          //{
+  68          //  Write24Bit(0,0xff,0);
+  69          //}
+  70          
+  71          ///*
+  72          //  橙灯
+  73          //*/
+  74          //void RGB_LED_Orange(void)
+  75          //{
+  76          //  for(i=0;i<4;i++)  //4个灯
+  77          //  {
+  78          //    Write24Bit(0xa5,0xff,0x00);
+  79          //  }
+  80          //}
+  81          
+  82          ///*
+  83          //  蓝灯
+  84          //*/
+  85          //void RGB_LED_Off(void)
+  86          //{
+  87          //  unsigned char i;
+  88          //  for(i=0;i<4;i++)   //四个灯
+  89          //  {
+  90          //    Write24Bit(0,0,0);
+  91          //  }
+  92          //}
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    144    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----       6
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  2 WARNING(S),  0 ERROR(S)

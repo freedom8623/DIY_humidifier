@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   DHT                                                               12/13/2023 11:29:08 PAGE 1   
+C51 COMPILER V9.60.7.0   DHT                                                               12/14/2023 12:09:17 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE DHT
@@ -62,7 +62,7 @@ line level    source
   52   2        }
   53   1      }
   54          
-C51 COMPILER V9.60.7.0   DHT                                                               12/13/2023 11:29:08 PAGE 2   
+C51 COMPILER V9.60.7.0   DHT                                                               12/14/2023 12:09:17 PAGE 2   
 
   55          /*
   56          主机（单片机）发送起始信号：
@@ -108,57 +108,62 @@ line level    source
              -平，则为“1”。
   96          3.继续重复上述1,2步骤累计40次。
   97          ------------------------------------------------*/
-  98          uchar T_H;
-  99          void DHT11_receive()      //接收40位的数据
- 100          {
- 101   1          uchar R_H,R_L,T_L,RH,RL,TH,TL,revise; 
- 102   1          DHT11_start();//发送起始信号：
- 103   1        
- 104   1        
- 105   1          if(DHT==0)
- 106   1          {
- 107   2              while(DHT==0);   //等待拉高     
- 108   2              DHT11_delay_us(40);  //拉高后延时80us
- 109   2            
- 110   2              R_H=DHT11_rec_byte();    //接收湿度高八位  
- 111   2              R_L=DHT11_rec_byte();    //接收湿度低八位  
- 112   2              T_H=DHT11_rec_byte();    //接收温度高八位  
- 113   2              T_L=DHT11_rec_byte();    //接收温度低八位
- 114   2              revise=DHT11_rec_byte(); //接收校正位
- 115   2      
-C51 COMPILER V9.60.7.0   DHT                                                               12/13/2023 11:29:08 PAGE 3   
+  98          unsigned int DHT_T;
+  99          uchar T_H;
+ 100          void DHT11_receive()      //接收40位的数据
+ 101          {
+ 102   1          uchar R_H,R_L,T_L,RH,RL,TH,TL,revise; 
+ 103   1      //    if(DHT_T) return;
+ 104   1      //    DHT_T = 1;
+ 105   1        
+ 106   1         
+ 107   1          DHT11_start();//发送起始信号：
+ 108   1        
+ 109   1        
+ 110   1          if(DHT==0)
+ 111   1          {
+ 112   2              while(DHT==0);   //等待拉高     
+ 113   2              DHT11_delay_us(40);  //拉高后延时80us
+ 114   2            
+ 115   2              R_H=DHT11_rec_byte();    //接收湿度高八位  
+C51 COMPILER V9.60.7.0   DHT                                                               12/14/2023 12:09:17 PAGE 3   
 
- 116   2              DHT11_delay_us(25);    //结束
- 117   2      
- 118   2              if((R_H+R_L+T_H+T_L)==revise)      //最后一字节为校验位，校验是否正确
- 119   2              {
- 120   3                  RH=R_H;
- 121   3                  RL=R_L;
- 122   3                  TH=T_H;
- 123   3                  TL=T_L;
- 124   3              } 
- 125   2              
- 126   2              /*数据处理，转换为字符，方便显示*/
- 127   2              //湿度
- 128   2              rec_dat[0]='0'+(RH/10);
- 129   2              rec_dat[1]='0'+(RH%10);
- 130   2              rec_dat[2]=' ';
- 131   2              rec_dat[3]=' ';
- 132   2              
- 133   2              //温度
- 134   2              rec_dat[4]='0'+(TH/10);
- 135   2              rec_dat[5]='0'+(TH%10); 
- 136   2              rec_dat[6]=' ';
- 137   2            
- 138   2          }
- 139   1      
- 140   1      }
+ 116   2              R_L=DHT11_rec_byte();    //接收湿度低八位  
+ 117   2              T_H=DHT11_rec_byte();    //接收温度高八位  
+ 118   2              T_L=DHT11_rec_byte();    //接收温度低八位
+ 119   2              revise=DHT11_rec_byte(); //接收校正位
+ 120   2      
+ 121   2              DHT11_delay_us(25);    //结束
+ 122   2      
+ 123   2              if((R_H+R_L+T_H+T_L)==revise)      //最后一字节为校验位，校验是否正确
+ 124   2              {
+ 125   3                  RH=R_H;
+ 126   3                  RL=R_L;
+ 127   3                  TH=T_H;
+ 128   3                  TL=T_L;
+ 129   3              } 
+ 130   2              
+ 131   2              /*数据处理，转换为字符，方便显示*/
+ 132   2              //湿度
+ 133   2              rec_dat[0]='0'+(RH/10);
+ 134   2              rec_dat[1]='0'+(RH%10);
+ 135   2              rec_dat[2]=' ';
+ 136   2              rec_dat[3]=' ';
+ 137   2              
+ 138   2              //温度
+ 139   2              rec_dat[4]='0'+(TH/10);
+ 140   2              rec_dat[5]='0'+(TH%10); 
+ 141   2              rec_dat[6]=' ';
+ 142   2            
+ 143   2          }
+ 144   1      
+ 145   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
    CODE SIZE        =    291    ----
    CONSTANT SIZE    =   ----    ----
-   XDATA SIZE       =      1       5
+   XDATA SIZE       =      3       5
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----

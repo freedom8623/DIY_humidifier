@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   PWM                                                               12/13/2023 11:29:07 PAGE 1   
+C51 COMPILER V9.60.7.0   PWM                                                               12/14/2023 15:50:42 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE PWM
@@ -8,45 +8,45 @@ COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE Driver\Pwm.c LARGE WARNINGLEVEL(
 
 line level    source
 
-   1          #include "Pwm.h"
-   2          
-   3          /*************  本地变量声明    **************/
-   4          #define PWM_PERIOD  222    //设置周期值
-   5          void Pwm_init(void)
-   6          {
-   7   1        
-   8   1         P_SW2 |= 0x80;  //扩展寄存器(XFR)访问使能
-   9   1         
-  10   1         //设置初始占空比
-  11   1          PWM1_Duty = 150;
-  12   1         // PWM2_Duty = 500;
-  13   1         
-  14   1         
-  15   1          PWMA_CCER1 = 0x00; //写 CCMRx 前必须先清零 CCxE 关闭通道
-  16   1          PWMA_CCER2 = 0x00;
-  17   1          PWMA_CCMR1 = 0x68; //通道模式配置
-  18   1          PWMA_CCMR2 = 0x68;
-  19   1        
-  20   1        
+   1          
+   2          #include "Pwm.h"
+   3          
+   4          /*************  本地变量声明    **************/
+   5          
+   6          extern unsigned char PWM1_Duty1;
+   7          void Pwm_init(void)
+   8          {
+   9   1        
+  10   1         P_SW2 |= 0x80;  //扩展寄存器(XFR)访问使能
+  11   1          PWM1_Duty1 = 222;
+  12   1         //设置初始占空比
+  13   1          PWM1_Duty = PWM1_on;
+  14   1         // PWM2_Duty = 500;
+  15   1         
+  16   1         
+  17   1          PWMA_CCER1 = 0x00; //写 CCMRx 前必须先清零 CCxE 关闭通道
+  18   1          
+  19   1          PWMA_CCMR1 = 0x60; //通道模式配置
+  20   1      
   21   1        
-  22   1          PWMA_CCER1 = 0x55; //配置通道输出使能和极性  1PN  /2 PN
-  23   1      
-  24   1      
-  25   1          PWMA_ARRH = (u8)(PWM_PERIOD >> 8); //设置周期时间 N = （T目标*时钟频率）/2 =111  占空比为50%  108khz=9
+  22   1        
+  23   1          PWMA_ETRPS |= 11;
+  24   1          PWMA_CCER1 = 0x05; //配置通道输出使能和极性  1PN 
+  25   1      
+  26   1      
+  27   1          PWMA_ARRH = (u8)(PWM_PERIOD >> 8); //设置周期时间 N = （T目标*时钟频率）/2 =111  占空比为50%  108khz=9
              -.026us
-  26   1          PWMA_ARRL = (u8)PWM_PERIOD;
-  27   1      
-  28   1          PWMA_ENO = 0x00;
-  29   1          PWMA_ENO |= ENO1P; //使能输出
-  30   1          PWMA_ENO |= ENO1N; //使能输出
-  31   1          //PWMA_ENO |= ENO2P; //使能输出
-  32   1          //PWMA_ENO |= ENO2N; //使能输出
-  33   1          
+  28   1          PWMA_ARRL = (u8)PWM_PERIOD;
+  29   1      
+  30   1          PWMA_ENO = 0x00;
+  31   1         
+  32   1          PWMA_ENO |= ENO1N; //使能输出
+  33   1      
   34   1          
-  35   1          PWMA_PS = 0x00;  //高级 PWM 通道输出脚选择位
-  36   1          PWMA_PS |= PWM1_1; //选择 PWM1_3 通道P:P1.0  N:P1.1(雾化器)
-  37   1         // PWMA_PS |= PWM2_2; //选择 PWM2_3 通道P:P2.2  N:P2.3（led）
-  38   1          
+  35   1          
+  36   1          PWMA_PS = 0x00;  //高级 PWM 通道输出脚选择位
+  37   1          PWMA_PS |= PWM1_1; //选择 PWM1_3 通道P:P1.0  N:P1.1(雾化器)
+  38   1      
   39   1          PWMA_BKR = 0x80; //使能主输出
   40   1          PWMA_CR1 |= 0x01; //开始计时
   41   1        
@@ -62,7 +62,7 @@ line level    source
   51          // 参数: none.
   52          // 返回: none.
   53          //========================================================================
-C51 COMPILER V9.60.7.0   PWM                                                               12/13/2023 11:29:07 PAGE 2   
+C51 COMPILER V9.60.7.0   PWM                                                               12/14/2023 15:50:42 PAGE 2   
 
   54          void UpdatePwm(void)
   55          {
@@ -85,7 +85,7 @@ line level    source
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    104    ----
+   CODE SIZE        =    109    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----

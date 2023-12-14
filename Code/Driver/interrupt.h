@@ -5,12 +5,8 @@ extern int T_Tick;//一毫米累加
 //添加头文件
 #include "stc8h.h"                 //STC8A8K单片机头文件
 #include "main.h"
+//按键结构体
 
-//蜂鸣器引脚
-sbit Buzzer = P3^7;
-
-//水位引脚
-sbit Water_test = P3^6;
 //按键的结构体 结构体在mian.h
 extern struct keys key[];
 
@@ -24,5 +20,4 @@ struct keys
 	int longkey_flag;//长按标志位
 	
 };
-void Alertor(void);
 #endif

@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   OLED                                                              12/13/2023 13:03:18 PAGE 1   
+C51 COMPILER V9.60.7.0   OLED                                                              12/14/2023 11:31:49 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE OLED
@@ -62,7 +62,7 @@ line level    source
   52   1          {
   53   2            OLED_WR_Byte(0xC0,OLED_CMD);//反转显示
   54   2            OLED_WR_Byte(0xA0,OLED_CMD);
-C51 COMPILER V9.60.7.0   OLED                                                              12/13/2023 13:03:18 PAGE 2   
+C51 COMPILER V9.60.7.0   OLED                                                              12/14/2023 11:31:49 PAGE 2   
 
   55   2          }
   56   1      }
@@ -126,7 +126,7 @@ line level    source
  114   2          IIC_delay();
  115   2          OLED_SCL_Clr();
  116   2          dat<<=1;
-C51 COMPILER V9.60.7.0   OLED                                                              12/13/2023 13:03:18 PAGE 3   
+C51 COMPILER V9.60.7.0   OLED                                                              12/14/2023 11:31:49 PAGE 3   
 
  117   2        }
  118   1      }
@@ -190,7 +190,7 @@ line level    source
  176          {       
  177   1        u8 c=0,sizex=sizey/2;
  178   1        u16 i=0,size1;
-C51 COMPILER V9.60.7.0   OLED                                                              12/13/2023 13:03:18 PAGE 4   
+C51 COMPILER V9.60.7.0   OLED                                                              12/14/2023 11:31:49 PAGE 4   
 
  179   1        if(sizey==8)size1=6;
  180   1        else size1=(sizey/8+((sizey%8)?1:0))*(sizey/2);
@@ -254,7 +254,7 @@ line level    source
  238   1        for(i=0;i<size1;i++)
  239   1        {
  240   2          if(i%sizey==0) OLED_Set_Pos(x,y++);
-C51 COMPILER V9.60.7.0   OLED                                                              12/13/2023 13:03:18 PAGE 5   
+C51 COMPILER V9.60.7.0   OLED                                                              12/14/2023 11:31:49 PAGE 5   
 
  241   2          if(sizey==16) OLED_WR_Byte(Hzk[no][i],OLED_DATA);//16x16字号
  242   2      //    else if(sizey==xx) OLED_WR_Byte(xxx[c][i],OLED_DATA);//用户添加字号
@@ -318,7 +318,7 @@ line level    source
  300   1        OLED_WR_Byte(0x14,OLED_CMD);//--set(0x10) disable
  301   1        OLED_WR_Byte(0xA4,OLED_CMD);// Disable Entire Display On (0xa4/0xa5)
  302   1        OLED_WR_Byte(0xA6,OLED_CMD);// Disable Inverse Display On (0xa6/a7) 
-C51 COMPILER V9.60.7.0   OLED                                                              12/13/2023 13:03:18 PAGE 6   
+C51 COMPILER V9.60.7.0   OLED                                                              12/14/2023 11:31:49 PAGE 6   
 
  303   1        OLED_Clear();
  304   1        OLED_WR_Byte(0xAF,OLED_CMD); /*display ON*/ 

@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   BUZZER                                                            12/13/2023 11:47:39 PAGE 1   
+C51 COMPILER V9.60.7.0   BUZZER                                                            12/14/2023 11:29:28 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE BUZZER
@@ -8,35 +8,12 @@ COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE Driver\Buzzer.c LARGE WARNINGLEV
 
 line level    source
 
-   1          #include "Buzzer.h"
-   2          //水位/蜂鸣器（报警器）进程
-   3          char Water_Flag = 0;
-   4          //定时器1ns
-   5          int T_Tick;
-   6          void Alertor(void)
-   7          {
-   8   1        if(T_Tick%500==0) Water_Flag = 1;
-   9   1        else return;
-  10   1        
-  11   1        if(Water_Flag == 1)
-  12   1        { 
-  13   2            Water_Flag = 0;
-  14   2            if(Water_test == 1)
-  15   2          {
-  16   3            if(T_Tick%500==0) Buzzer ^= 1;
-  17   3          }
-  18   2        
-  19   2          }else
-  20   1          {
-  21   2              Buzzer = 0;
-  22   2          }
-  23   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =     38    ----
+   CODE SIZE        =   ----    ----
    CONSTANT SIZE    =   ----    ----
-   XDATA SIZE       =      3    ----
+   XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----
