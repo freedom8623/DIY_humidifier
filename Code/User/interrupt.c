@@ -87,7 +87,7 @@ void timer3_int(void) interrupt 19
 				if(key[i].key_sta == 0)
 					{
 						key[i].judge_sta = 2;
-
+						key[i].key_time++;
 					}
 				else
 					{
@@ -105,23 +105,16 @@ void timer3_int(void) interrupt 19
 								//确定是否为短按
 						if(key[i].key_time<=100)
 							{
-							key[i].single_flag = 1;
-							}
-						}else
-						{
-						key[i].key_time++;
-						}
-						//判断如果按下时间大于70ms长按标志位置为1
-						if(key[i].key_time>100){
+							key[i].single_flag = 0;
+							}else
+							{
 							key[i].longkey_flag = 1;
-					}
-				
-				
+							}
+						}
 				break;
-					}
+				}
 									
 			}				
-		
 	
 	}
 }

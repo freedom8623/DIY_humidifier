@@ -8,7 +8,6 @@ void Pwm_init(void)
 {
 	
 	 P_SW2 |= 0x80;  //扩展寄存器(XFR)访问使能
-		PWM1_Duty1 = 222;
 	 //设置初始占空比
 		PWM1_Duty = PWM1_on;
    // PWM2_Duty = 500;
@@ -36,6 +35,8 @@ void Pwm_init(void)
 		PWMA_PS = 0x00;  //高级 PWM 通道输出脚选择位
     PWMA_PS |= PWM1_1; //选择 PWM1_3 通道P:P1.0  N:P1.1(雾化器)
 
+		PWMA_ETRPS = 0x01;
+	
 		PWMA_BKR = 0x80; //使能主输出
     PWMA_CR1 |= 0x01; //开始计时
 	
@@ -53,8 +54,8 @@ void Pwm_init(void)
 //========================================================================
 void UpdatePwm(void)
 {
-    PWMA_CCR1H = (u8)(PWM1_Duty >> 8); //设置占空比时间
-    PWMA_CCR1L = (u8)(PWM1_Duty);
+    PWMA_CCR1H = (u8)(PWM1_off >> 8); //设置占空比时间
+    PWMA_CCR1L = (u8)(PWM1_off);
    // PWMA_CCR2H = (u8)(PWM2_Duty >> 8); //设置占空比时间
   //  PWMA_CCR2L = (u8)(PWM2_Duty);
 

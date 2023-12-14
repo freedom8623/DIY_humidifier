@@ -3,8 +3,7 @@
 #include "pwm.h"
 //按键
 struct keys key[];
-//占空比
-unsigned int PWM1_Duty1;
+
 
 void (*current_operation_index)(); //操作函数指针
 unsigned int  func_index = 0;//获取索引值
@@ -13,7 +12,7 @@ unsigned int Water_Flag;
 //温度
 unsigned char rec_dat[9] = {'0','0','0','0','0','0','0','0','0'}; //储存数据
 //=====================================
-int limit_humit = 100;
+int limit_humit = 80;
 char light_mode =0;
 extern unsigned char new_light_mode;
 extern unsigned int new_limit_humit;
@@ -23,6 +22,7 @@ int setting_duty =1;
 uchar showtext[16];
 uchar showtext2[16];
 //current索引  enter确定 长按进入菜单 next下一个 +   last上一个 -  back返回 长按关闭喷雾
+int humit = 0;
 
 Menu_table  table[29]=
 {
@@ -66,6 +66,7 @@ void Page0(void)
 		OLED_ShowChinese(32,2,4,16);/*湿度*/
 		OLED_ShowChinese(48,2,5,16);
 		sprintf(showtext,":%c%c%",rec_dat[0],rec_dat[1]);
+		humit = rec_dat[0] -'0'+ rec_dat[1] -'0';
 		OLED_ShowString(64,2,showtext,16);
 		
 		OLED_ShowChinese(32,4,8,16);/*水位*/
@@ -235,10 +236,14 @@ void Key_Proc(void)
 			if(func_index == 3)
 			{
 				limit_humit++;
+				if(limit_humit >= 100)limit_humit =0;
+				
+					
 			}
 			if(func_index == 4)
 			{
 				light_mode++;
+				if(light_mode >= 7)light_mode =0;
 			}
 			new_limit_humit=limit_humit;
 			new_light_mode = light_mode;
@@ -254,10 +259,13 @@ void Key_Proc(void)
 			if(func_index == 3)
 			{
 				limit_humit--;
+				if(limit_humit <= 0)limit_humit =100;
 			}
 			if(func_index == 4)
 			{
+				
 				light_mode--;
+				if(light_mode <= 0)light_mode =7;
 			}
 			new_limit_humit=limit_humit;
 			new_light_mode = light_mode;
@@ -296,6 +304,12 @@ void Key_Proc(void)
 				}
 				key[3].longkey_flag = 0;
 		}
+	}
+	
+	if(new_limit_humit < humit)
+	{
+				PWMA_CCR1H = (u8)(PWM1_off >> 8); //设置占空比时间
+				PWMA_CCR1L = (u8)(PWM1_off);
 	}
 	current_operation_index=table[func_index].current_operation;//执行当前索引号所对应的功能函数。
   (*current_operation_index)();

@@ -19,10 +19,11 @@ CPU DLL:         S8051.DLL V3.125.1.0
 Dialog DLL:      DP51.DLL V2.69.0.0 
 <h2>Project:</h2>
 D:\desk\项目集合\加湿器\Code\humidifier.uvproj
-Project File Date:  12/13/2023
+Project File Date:  12/14/2023
 
 <h2>Output:</h2>
 Build target 'Target 1'
+compiling interrupt.c...
 linking...
 *** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
     SEGMENT: ?PR?_SETTING_PWM?PWM
@@ -50,11 +51,7 @@ linking...
 *** WARNING L2: REFERENCE MADE TO UNRESOLVED EXTERNAL
     SYMBOL:  PWM1_DUTY
     MODULE:  .\Objects\Pwm.obj (PWM)
-    ADDRESS: 000DH
-*** WARNING L2: REFERENCE MADE TO UNRESOLVED EXTERNAL
-    SYMBOL:  PWM1_DUTY
-    MODULE:  .\Objects\Pwm.obj (PWM)
-    ADDRESS: 228BH
+    ADDRESS: 0007H
 *** WARNING L2: REFERENCE MADE TO UNRESOLVED EXTERNAL
     SYMBOL:  PWM1_DUTY
     MODULE:  .\Objects\Pwm.obj (PWM)
@@ -65,10 +62,29 @@ linking...
 *** WARNING L2: REFERENCE MADE TO UNRESOLVED EXTERNAL
     SYMBOL:  _OLED_POW
     MODULE:  .\Objects\oled.obj (OLED)
-    ADDRESS: 1763H
-Program Size: data=15.1 xdata=398 code=9010
+    ADDRESS: 17E3H
+*** WARNING L1: UNRESOLVED EXTERNAL SYMBOL
+    SYMBOL:  NEW_LIMIT_HUMIT
+    MODULE:  .\Objects\Menu.obj (MENU)
+*** WARNING L2: REFERENCE MADE TO UNRESOLVED EXTERNAL
+    SYMBOL:  NEW_LIMIT_HUMIT
+    MODULE:  .\Objects\Menu.obj (MENU)
+    ADDRESS: 113BH
+*** WARNING L2: REFERENCE MADE TO UNRESOLVED EXTERNAL
+    SYMBOL:  NEW_LIMIT_HUMIT
+    MODULE:  .\Objects\Menu.obj (MENU)
+    ADDRESS: 11CEH
+*** WARNING L2: REFERENCE MADE TO UNRESOLVED EXTERNAL
+    SYMBOL:  NEW_LIMIT_HUMIT
+    MODULE:  .\Objects\Menu.obj (MENU)
+    ADDRESS: 1266H
+*** WARNING L2: REFERENCE MADE TO UNRESOLVED EXTERNAL
+    SYMBOL:  NEW_LIMIT_HUMIT
+    MODULE:  .\Objects\Menu.obj (MENU)
+    ADDRESS: 126BH
+Program Size: data=15.1 xdata=398 code=9129
 creating hex file from ".\Objects\humidifier"...
-".\Objects\humidifier" - 0 Error(s), 16 Warning(s).
+".\Objects\humidifier" - 0 Error(s), 20 Warning(s).
 Build Time Elapsed:  00:00:01
 </pre>
 </body>

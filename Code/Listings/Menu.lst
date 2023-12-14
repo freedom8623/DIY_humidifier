@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.7.0   MENU                                                              12/14/2023 16:02:20 PAGE 1   
+C51 COMPILER V9.60.7.0   MENU                                                              12/14/2023 20:53:32 PAGE 1   
 
 
 C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MENU
@@ -13,26 +13,26 @@ line level    source
    3          #include "pwm.h"
    4          //按键
    5          struct keys key[];
-   6          //占空比
-   7          unsigned int PWM1_Duty1;
-   8          
-   9          void (*current_operation_index)(); //操作函数指针
-  10          unsigned int  func_index = 0;//获取索引值
-  11          unsigned int Water_Flag;
-  12          
-  13          //温度
-  14          unsigned char rec_dat[9] = {'0','0','0','0','0','0','0','0','0'}; //储存数据
-  15          //=====================================
-  16          int limit_humit = 100;
-  17          char light_mode =0;
-  18          extern unsigned char new_light_mode;
-  19          extern unsigned int new_limit_humit;
-  20          
-  21          int setting_duty =1;
-  22          //========菜单========================
-  23          uchar showtext[16];
-  24          uchar showtext2[16];
-  25          //current索引  enter确定 长按进入菜单 next下一个 +   last上一个 -  back返回 长按关闭喷雾
+   6          
+   7          
+   8          void (*current_operation_index)(); //操作函数指针
+   9          unsigned int  func_index = 0;//获取索引值
+  10          unsigned int Water_Flag;
+  11          
+  12          //温度
+  13          unsigned char rec_dat[9] = {'0','0','0','0','0','0','0','0','0'}; //储存数据
+  14          //=====================================
+  15          int limit_humit = 80;
+  16          char light_mode =0;
+  17          extern unsigned char new_light_mode;
+  18          extern unsigned int new_limit_humit;
+  19          
+  20          int setting_duty =1;
+  21          //========菜单========================
+  22          uchar showtext[16];
+  23          uchar showtext2[16];
+  24          //current索引  enter确定 长按进入菜单 next下一个 +   last上一个 -  back返回 长按关闭喷雾
+  25          int humit = 0;
   26          
   27          Menu_table  table[29]=
   28          {
@@ -62,7 +62,7 @@ line level    source
   52            
   53          };
   54          
-C51 COMPILER V9.60.7.0   MENU                                                              12/14/2023 16:02:20 PAGE 2   
+C51 COMPILER V9.60.7.0   MENU                                                              12/14/2023 20:53:32 PAGE 2   
 
   55          void Page0(void)
   56          {
@@ -79,259 +79,274 @@ line level    source
   66   1          OLED_ShowChinese(32,2,4,16);/*湿度*/
   67   1          OLED_ShowChinese(48,2,5,16);
   68   1          sprintf(showtext,":%c%c%",rec_dat[0],rec_dat[1]);
-  69   1          OLED_ShowString(64,2,showtext,16);
-  70   1          
-  71   1          OLED_ShowChinese(32,4,8,16);/*水位*/
-  72   1          OLED_ShowChinese(48,4,9,16);
-  73   1          OLED_ShowString(64,4,":",16);
-  74   1          if(Water_Flag == 1){
-  75   2            
-  76   2            OLED_ShowChinese(80,4,13,16);/*×*/
-  77   2          }
-  78   1          if(Water_Flag == 0){
-  79   2            
-  80   2            OLED_ShowChinese(80,4,12,16);/*√*/
-  81   2          }
-  82   1        
-  83   1          OLED_ShowChinese(32,6,10,16);/*雾化*/
-  84   1          OLED_ShowChinese(48,6,11,16);
-  85   1          OLED_ShowString(64,6,":",16);
-  86   1          
-  87   1          if(setting_duty == 1){
-  88   2            
-  89   2            OLED_ShowChinese(80,6,12,16);/*√*/
-  90   2          }
-  91   1          if(setting_duty == 0){
-  92   2            
-  93   2            OLED_ShowChinese(80,6,13,16);/*×*/
-  94   2          }
-  95   1      
-  96   1      }
-  97          
-  98          void Page1(void)
-  99          {
- 100   1          OLED_ShowChinese(48,0,6,16); /*设置*/
- 101   1          OLED_ShowChinese(64,0,7,16); /*设置*/
- 102   1          OLED_ShowString(0,0,"======",16);OLED_ShowString(80,0,"=====",16);
- 103   1        
- 104   1          OLED_ShowString(0,2,">",16);
- 105   1          OLED_ShowChinese(16,2,6,16); /*设置*/
- 106   1          OLED_ShowChinese(32,2,7,16); 
- 107   1          OLED_ShowChinese(48,2,4,16);/*湿度*/
- 108   1          OLED_ShowChinese(64,2,5,16);
- 109   1      
- 110   1          
- 111   1          OLED_ShowChinese(16,4,6,16); /*设置*/
- 112   1          OLED_ShowChinese(32,4,7,16); 
- 113   1          OLED_ShowChinese(48,4,0,16);/*湿度*/
- 114   1          OLED_ShowChinese(64,4,1,16);
- 115   1        
-C51 COMPILER V9.60.7.0   MENU                                                              12/14/2023 16:02:20 PAGE 3   
+  69   1          humit = rec_dat[0] -'0'+ rec_dat[1] -'0';
+  70   1          OLED_ShowString(64,2,showtext,16);
+  71   1          
+  72   1          OLED_ShowChinese(32,4,8,16);/*水位*/
+  73   1          OLED_ShowChinese(48,4,9,16);
+  74   1          OLED_ShowString(64,4,":",16);
+  75   1          if(Water_Flag == 1){
+  76   2            
+  77   2            OLED_ShowChinese(80,4,13,16);/*×*/
+  78   2          }
+  79   1          if(Water_Flag == 0){
+  80   2            
+  81   2            OLED_ShowChinese(80,4,12,16);/*√*/
+  82   2          }
+  83   1        
+  84   1          OLED_ShowChinese(32,6,10,16);/*雾化*/
+  85   1          OLED_ShowChinese(48,6,11,16);
+  86   1          OLED_ShowString(64,6,":",16);
+  87   1          
+  88   1          if(setting_duty == 1){
+  89   2            
+  90   2            OLED_ShowChinese(80,6,12,16);/*√*/
+  91   2          }
+  92   1          if(setting_duty == 0){
+  93   2            
+  94   2            OLED_ShowChinese(80,6,13,16);/*×*/
+  95   2          }
+  96   1      
+  97   1      }
+  98          
+  99          void Page1(void)
+ 100          {
+ 101   1          OLED_ShowChinese(48,0,6,16); /*设置*/
+ 102   1          OLED_ShowChinese(64,0,7,16); /*设置*/
+ 103   1          OLED_ShowString(0,0,"======",16);OLED_ShowString(80,0,"=====",16);
+ 104   1        
+ 105   1          OLED_ShowString(0,2,">",16);
+ 106   1          OLED_ShowChinese(16,2,6,16); /*设置*/
+ 107   1          OLED_ShowChinese(32,2,7,16); 
+ 108   1          OLED_ShowChinese(48,2,4,16);/*湿度*/
+ 109   1          OLED_ShowChinese(64,2,5,16);
+ 110   1      
+ 111   1          
+ 112   1          OLED_ShowChinese(16,4,6,16); /*设置*/
+ 113   1          OLED_ShowChinese(32,4,7,16); 
+ 114   1          OLED_ShowChinese(48,4,0,16);/*湿度*/
+ 115   1          OLED_ShowChinese(64,4,1,16);
+C51 COMPILER V9.60.7.0   MENU                                                              12/14/2023 20:53:32 PAGE 3   
 
- 116   1      }
- 117          
- 118          void Page2(void)
- 119          {
- 120   1          OLED_ShowChinese(48,0,6,16); /*设置*/
- 121   1          OLED_ShowChinese(64,0,7,16); /*设置*/
- 122   1          OLED_ShowString(0,0,"======",16);OLED_ShowString(80,0,"=====",16);
- 123   1        
- 124   1          
- 125   1          OLED_ShowChinese(16,2,6,16); /*设置*/
- 126   1          OLED_ShowChinese(32,2,7,16); 
- 127   1          OLED_ShowChinese(48,2,4,16);/*湿度*/
- 128   1          OLED_ShowChinese(64,2,5,16);
- 129   1      
- 130   1          OLED_ShowString(0,4,">",16);
- 131   1          OLED_ShowChinese(16,4,6,16); /*设置*/
- 132   1          OLED_ShowChinese(32,4,7,16); 
- 133   1          OLED_ShowChinese(48,4,0,16);/*灯光*/
- 134   1          OLED_ShowChinese(64,4,1,16);
- 135   1        
- 136   1      }
- 137          //int setting_humit = 0;
- 138          
+ 116   1        
+ 117   1      }
+ 118          
+ 119          void Page2(void)
+ 120          {
+ 121   1          OLED_ShowChinese(48,0,6,16); /*设置*/
+ 122   1          OLED_ShowChinese(64,0,7,16); /*设置*/
+ 123   1          OLED_ShowString(0,0,"======",16);OLED_ShowString(80,0,"=====",16);
+ 124   1        
+ 125   1          
+ 126   1          OLED_ShowChinese(16,2,6,16); /*设置*/
+ 127   1          OLED_ShowChinese(32,2,7,16); 
+ 128   1          OLED_ShowChinese(48,2,4,16);/*湿度*/
+ 129   1          OLED_ShowChinese(64,2,5,16);
+ 130   1      
+ 131   1          OLED_ShowString(0,4,">",16);
+ 132   1          OLED_ShowChinese(16,4,6,16); /*设置*/
+ 133   1          OLED_ShowChinese(32,4,7,16); 
+ 134   1          OLED_ShowChinese(48,4,0,16);/*灯光*/
+ 135   1          OLED_ShowChinese(64,4,1,16);
+ 136   1        
+ 137   1      }
+ 138          //int setting_humit = 0;
  139          
- 140          void Page3(void)
- 141          {
- 142   1          OLED_ShowChinese(48,0,6,16); /*设置*/
- 143   1          OLED_ShowChinese(64,0,7,16); /*设置*/
- 144   1          OLED_ShowString(0,0,"======",16);OLED_ShowString(80,0,"=====",16);
- 145   1        
- 146   1          
- 147   1          OLED_ShowChinese(16,2,14,16); /*设置*/
- 148   1          OLED_ShowChinese(32,2,15,16); 
- 149   1          OLED_ShowChinese(48,2,4,16);/*湿度*/
- 150   1          OLED_ShowChinese(64,2,5,16);
- 151   1        
- 152   1            sprintf(showtext,":%03d%",limit_humit);
- 153   1          OLED_ShowString(80,2,showtext,16);
- 154   1        
- 155   1      
- 156   1        
+ 140          
+ 141          void Page3(void)
+ 142          {
+ 143   1          OLED_ShowChinese(48,0,6,16); /*设置*/
+ 144   1          OLED_ShowChinese(64,0,7,16); /*设置*/
+ 145   1          OLED_ShowString(0,0,"======",16);OLED_ShowString(80,0,"=====",16);
+ 146   1        
+ 147   1          
+ 148   1          OLED_ShowChinese(16,2,14,16); /*设置*/
+ 149   1          OLED_ShowChinese(32,2,15,16); 
+ 150   1          OLED_ShowChinese(48,2,4,16);/*湿度*/
+ 151   1          OLED_ShowChinese(64,2,5,16);
+ 152   1        
+ 153   1            sprintf(showtext,":%03d%",limit_humit);
+ 154   1          OLED_ShowString(80,2,showtext,16);
+ 155   1        
+ 156   1      
  157   1        
- 158   1      }
- 159          
- 160          void Page4(void)
- 161          {
- 162   1          OLED_ShowChinese(48,0,6,16); /*设置*/
- 163   1          OLED_ShowChinese(64,0,7,16); /*设置*/
- 164   1          OLED_ShowString(0,0,"======",16);OLED_ShowString(80,0,"=====",16);
- 165   1        
- 166   1          
- 167   1          OLED_ShowChinese(16,2,14,16); /*设置*/
- 168   1          OLED_ShowChinese(32,2,15,16); 
- 169   1          OLED_ShowChinese(48,2,0,16);/*成功*/
- 170   1          OLED_ShowChinese(64,2,1,16);
- 171   1        
- 172   1          sprintf(showtext,":%03c%",light_mode);
- 173   1          OLED_ShowString(80,2,showtext,16);
- 174   1      
- 175   1        
+ 158   1        
+ 159   1      }
+ 160          
+ 161          void Page4(void)
+ 162          {
+ 163   1          OLED_ShowChinese(48,0,6,16); /*设置*/
+ 164   1          OLED_ShowChinese(64,0,7,16); /*设置*/
+ 165   1          OLED_ShowString(0,0,"======",16);OLED_ShowString(80,0,"=====",16);
+ 166   1        
+ 167   1          
+ 168   1          OLED_ShowChinese(16,2,14,16); /*设置*/
+ 169   1          OLED_ShowChinese(32,2,15,16); 
+ 170   1          OLED_ShowChinese(48,2,0,16);/*成功*/
+ 171   1          OLED_ShowChinese(64,2,1,16);
+ 172   1        
+ 173   1          sprintf(showtext,":%03c%",light_mode);
+ 174   1          OLED_ShowString(80,2,showtext,16);
+ 175   1      
  176   1        
- 177   1      }
-C51 COMPILER V9.60.7.0   MENU                                                              12/14/2023 16:02:20 PAGE 4   
+ 177   1        
+C51 COMPILER V9.60.7.0   MENU                                                              12/14/2023 20:53:32 PAGE 4   
 
- 178          
+ 178   1      }
  179          
- 180          void Page5(void)
- 181          {
- 182   1          OLED_ShowChinese(48,0,6,16); /*设置*/
- 183   1          OLED_ShowChinese(64,0,7,16); /*设置*/
- 184   1          OLED_ShowString(0,0,"======",16);OLED_ShowString(80,0,"=====",16);
- 185   1        
- 186   1          
- 187   1          OLED_ShowChinese(16,4,6,16); /*设置*/
- 188   1          OLED_ShowChinese(32,4,7,16); 
- 189   1          OLED_ShowChinese(48,4,16,16);/*成功*/
- 190   1          OLED_ShowChinese(64,4,17,16);
- 191   1      
- 192   1          OLED_ShowString(80,4,"^-^",16);
- 193   1      
- 194   1        
+ 180          
+ 181          void Page5(void)
+ 182          {
+ 183   1          OLED_ShowChinese(48,0,6,16); /*设置*/
+ 184   1          OLED_ShowChinese(64,0,7,16); /*设置*/
+ 185   1          OLED_ShowString(0,0,"======",16);OLED_ShowString(80,0,"=====",16);
+ 186   1        
+ 187   1          
+ 188   1          OLED_ShowChinese(16,4,6,16); /*设置*/
+ 189   1          OLED_ShowChinese(32,4,7,16); 
+ 190   1          OLED_ShowChinese(48,4,16,16);/*成功*/
+ 191   1          OLED_ShowChinese(64,4,17,16);
+ 192   1      
+ 193   1          OLED_ShowString(80,4,"^-^",16);
+ 194   1      
  195   1        
  196   1        
- 197   1      }
- 198          
+ 197   1        
+ 198   1      }
  199          
- 200          void Page6(void)
- 201          {
- 202   1          OLED_ShowChinese(48,0,6,16); /*设置*/
- 203   1          OLED_ShowChinese(64,0,7,16); /*设置*/
- 204   1          OLED_ShowString(0,0,"======",16);OLED_ShowString(80,0,"=====",16);
- 205   1        
- 206   1          
- 207   1          OLED_ShowChinese(16,4,6,16); /*设置*/
- 208   1          OLED_ShowChinese(32,4,7,16); 
- 209   1          OLED_ShowChinese(48,4,16,16);/*成功*/
- 210   1          OLED_ShowChinese(64,4,17,16);
- 211   1        
- 212   1          
- 213   1          OLED_ShowString(80,4,"^-^",16);
- 214   1      
- 215   1        
+ 200          
+ 201          void Page6(void)
+ 202          {
+ 203   1          OLED_ShowChinese(48,0,6,16); /*设置*/
+ 204   1          OLED_ShowChinese(64,0,7,16); /*设置*/
+ 205   1          OLED_ShowString(0,0,"======",16);OLED_ShowString(80,0,"=====",16);
+ 206   1        
+ 207   1          
+ 208   1          OLED_ShowChinese(16,4,6,16); /*设置*/
+ 209   1          OLED_ShowChinese(32,4,7,16); 
+ 210   1          OLED_ShowChinese(48,4,16,16);/*成功*/
+ 211   1          OLED_ShowChinese(64,4,17,16);
+ 212   1        
+ 213   1          
+ 214   1          OLED_ShowString(80,4,"^-^",16);
+ 215   1      
  216   1        
- 217   1      }
- 218          
+ 217   1        
+ 218   1      }
  219          
  220          
- 221          //按键处理
- 222          void Key_Proc(void)
- 223          {
- 224   1          if(key[0].single_flag == 1)//按键SW1 短按
- 225   1        { 
- 226   2          func_index=table[func_index].enter;//获取enter索引号
- 227   2          OLED_Clear();
- 228   2          key[0].single_flag = 0;
- 229   2        }
- 230   1      
- 231   1      //==============================================      
- 232   1         if(key[1].single_flag == 1)//向上
- 233   1        {
- 234   2            func_index=table[func_index].next;//获取next索引号
- 235   2            if(func_index == 3)
- 236   2            {
- 237   3              limit_humit++;
- 238   3            }
- 239   2            if(func_index == 4)
-C51 COMPILER V9.60.7.0   MENU                                                              12/14/2023 16:02:20 PAGE 5   
+ 221          
+ 222          //按键处理
+ 223          void Key_Proc(void)
+ 224          {
+ 225   1          if(key[0].single_flag == 1)//按键SW1 短按
+ 226   1        { 
+ 227   2          func_index=table[func_index].enter;//获取enter索引号
+ 228   2          OLED_Clear();
+ 229   2          key[0].single_flag = 0;
+ 230   2        }
+ 231   1      
+ 232   1      //==============================================      
+ 233   1         if(key[1].single_flag == 1)//向上
+ 234   1        {
+ 235   2            func_index=table[func_index].next;//获取next索引号
+ 236   2            if(func_index == 3)
+ 237   2            {
+ 238   3              limit_humit++;
+ 239   3              if(limit_humit >= 100)limit_humit =0;
+C51 COMPILER V9.60.7.0   MENU                                                              12/14/2023 20:53:32 PAGE 5   
 
- 240   2            {
- 241   3              light_mode++;
+ 240   3              
+ 241   3                
  242   3            }
- 243   2           
- 244   2            new_light_mode = light_mode;
- 245   2            OLED_Clear();
- 246   2            
- 247   2            key[1].single_flag = 0;
- 248   2        
- 249   2        }
- 250   1      //==============================================  
- 251   1         if(key[2].single_flag == 1)//向下
- 252   1         {
- 253   2          func_index=table[func_index].last;//获取last索引号
- 254   2            if(func_index == 3)
- 255   2            {
- 256   3              limit_humit--;
- 257   3            }
- 258   2            if(func_index == 4)
- 259   2            {
- 260   3              light_mode =0;
- 261   3              light_mode--;
- 262   3            }
- 263   2           
- 264   2          OLED_Clear();
- 265   2          key[2].single_flag = 0;
- 266   2        
- 267   2        }
- 268   1      //==============================================    
- 269   1        if(key[3].single_flag == 1)//关闭
- 270   1        {
- 271   2          func_index=table[func_index].back;//获取last索引号
- 272   2          OLED_Clear();
- 273   2          
- 274   2          key[3].single_flag = 0;
+ 243   2            if(func_index == 4)
+ 244   2            {
+ 245   3              light_mode++;
+ 246   3              if(light_mode >= 7)light_mode =0;
+ 247   3            }
+ 248   2            new_limit_humit=limit_humit;
+ 249   2            new_light_mode = light_mode;
+ 250   2            OLED_Clear();
+ 251   2            
+ 252   2            key[1].single_flag = 0;
+ 253   2        
+ 254   2        }
+ 255   1      //==============================================  
+ 256   1         if(key[2].single_flag == 1)//向下
+ 257   1         {
+ 258   2          func_index=table[func_index].last;//获取last索引号
+ 259   2            if(func_index == 3)
+ 260   2            {
+ 261   3              limit_humit--;
+ 262   3              if(limit_humit <= 0)limit_humit =100;
+ 263   3            }
+ 264   2            if(func_index == 4)
+ 265   2            {
+ 266   3              
+ 267   3              light_mode--;
+ 268   3              if(light_mode <= 0)light_mode =7;
+ 269   3            }
+ 270   2            new_limit_humit=limit_humit;
+ 271   2            new_light_mode = light_mode;
+ 272   2           
+ 273   2          OLED_Clear();
+ 274   2          key[2].single_flag = 0;
  275   2        
  276   2        }
- 277   1       
- 278   1          if(key[3].longkey_flag == 1)//长按关闭雾化器;
+ 277   1      //==============================================    
+ 278   1        if(key[3].single_flag == 1)//关闭
  279   1        {
- 280   2            if(func_index==0)//获取last索引号
- 281   2        {
- 282   3              setting_duty ^= 1;
- 283   3            
- 284   3              if(setting_duty == 0)
- 285   3              {
- 286   4              
- 287   4              PWMA_CCR1H = (u8)(PWM1_off >> 8); //设置占空比时间
- 288   4              PWMA_CCR1L = (u8)(PWM1_off);
- 289   4              
- 290   4              }
- 291   3              if(setting_duty == 1 )
- 292   3              {
- 293   4              PWMA_CCR1H = (u8)(PWM1_on >> 8); //设置占空比时间
- 294   4              PWMA_CCR1L = (u8)(PWM1_on);
- 295   4              }
- 296   3              key[3].longkey_flag = 0;
- 297   3          }
- 298   2        }
- 299   1        current_operation_index=table[func_index].current_operation;//执行当前索引号所对应的功能函数。
- 300   1        (*current_operation_index)();
- 301   1      }
-C51 COMPILER V9.60.7.0   MENU                                                              12/14/2023 16:02:20 PAGE 6   
+ 280   2          func_index=table[func_index].back;//获取last索引号
+ 281   2          OLED_Clear();
+ 282   2          
+ 283   2          key[3].single_flag = 0;
+ 284   2        
+ 285   2        }
+ 286   1       
+ 287   1          if(key[3].longkey_flag == 1)//长按关闭雾化器;
+ 288   1        {
+ 289   2            if(func_index==0)//获取last索引号
+ 290   2        {
+ 291   3              setting_duty ^= 1;
+ 292   3            
+ 293   3              if(setting_duty == 0)
+ 294   3              {
+ 295   4              
+ 296   4              PWMA_CCR1H = (u8)(PWM1_off >> 8); //设置占空比时间
+ 297   4              PWMA_CCR1L = (u8)(PWM1_off);
+ 298   4              
+ 299   4              }
+ 300   3              if(setting_duty == 1 )
+ 301   3              {
+C51 COMPILER V9.60.7.0   MENU                                                              12/14/2023 20:53:32 PAGE 6   
 
- 302          
- 303          
- 304          
- 305          
- 306          
- 307          
- 308          
- 309          
+ 302   4              PWMA_CCR1H = (u8)(PWM1_on >> 8); //设置占空比时间
+ 303   4              PWMA_CCR1L = (u8)(PWM1_on);
+ 304   4              }
+ 305   3              key[3].longkey_flag = 0;
+ 306   3          }
+ 307   2        }
+ 308   1        
+ 309   1        if(new_limit_humit < humit)
+ 310   1        {
+ 311   2              PWMA_CCR1H = (u8)(PWM1_off >> 8); //设置占空比时间
+ 312   2              PWMA_CCR1L = (u8)(PWM1_off);
+ 313   2        }
+ 314   1        current_operation_index=table[func_index].current_operation;//执行当前索引号所对应的功能函数。
+ 315   1        (*current_operation_index)();
+ 316   1      }
+ 317          
+ 318          
+ 319          
+ 320          
+ 321          
+ 322          
+ 323          
+ 324          
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   1995    ----
+   CODE SIZE        =   2157    ----
    CONSTANT SIZE    =     62    ----
    XDATA SIZE       =    287    ----
    PDATA SIZE       =   ----    ----
