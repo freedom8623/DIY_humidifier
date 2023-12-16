@@ -12,12 +12,8 @@
 
  
 
-//=========================================
-
-//============函数定义===================
-
-
 //============变量定义===================
+unsigned int new_light_mode;
 void main(void)
 { 
 	Buzzer = 0;//关闭蜂鸣器
@@ -39,7 +35,7 @@ void main(void)
 	while(1)
 	{
 		Key_Proc();
-		Alertor();
+		Alertor(new_light_mode);
 		DHT11_receive();//接收实时温度
 		
 		

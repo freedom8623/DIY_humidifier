@@ -1,6 +1,7 @@
 #include "Menu.h"
 #include "interrupt.h"
 #include "pwm.h"
+#include "stdlib.h"
 //按键
 struct keys key[];
 
@@ -13,30 +14,19 @@ unsigned int Water_Flag;
 unsigned char rec_dat[9] = {'0','0','0','0','0','0','0','0','0'}; //储存数据
 //=====================================
 int limit_humit = 80;
-char light_mode =0;
-extern unsigned char new_light_mode;
+unsigned char light_mode =0;
+extern unsigned int new_light_mode;
 extern unsigned int new_limit_humit;
 
-int setting_duty =1;
+int setting_duty = 0;
 //========菜单========================
 uchar showtext[16];
 uchar showtext2[16];
-//current索引  enter确定 长按进入菜单 next下一个 +   last上一个 -  back返回 长按关闭喷雾
-int humit = 0;
+//current索引 back返回 长按进入菜单 next下一个 +   last上一个 -  enter确定 长按关闭喷雾
+extern unsigned int  humit;
 
 Menu_table  table[29]=
 {
-////一级
-//{0, 1, 0, 0,  0,(*Page0)},//	进入一级菜单
-
-//{1, 3, 2, 2,  0,(*Page1)},//一级界面（设置）：一级界面选择第一行
-//{2, 4, 1, 1,  0,(*Page2)},//一级界面选择第二行
-
-//{3, 5, 3, 3,  1,(*Page3)},//二级界面
-//{4, 6, 4, 4,  2,(*Page4)},//二级界面
-
-//{5, 0, 3, 3,  3,(*Page5)},//成功显示
-//{6, 0, 4, 4,  4,(*Page6)},//成功显示
 
 	//一级
   {0, 0, 0, 0,  1,(*Page0)},//	进入一级菜单
@@ -54,6 +44,7 @@ Menu_table  table[29]=
 
 void Page0(void)
 {
+		new_limit_humit = limit_humit;
 		OLED_ShowString(0,0,"=======0^0======",16);  /*第一个参数是X控制左右位置设置为8/位，第二个参数是Y上下2/位*/
 		OLED_ShowString(0,2,"||",16);OLED_ShowString(112,2,"||",16);
 		OLED_ShowString(0,2,"||",16);OLED_ShowString(112,2,"||",16);
@@ -66,8 +57,9 @@ void Page0(void)
 		OLED_ShowChinese(32,2,4,16);/*湿度*/
 		OLED_ShowChinese(48,2,5,16);
 		sprintf(showtext,":%c%c%",rec_dat[0],rec_dat[1]);
-		humit = rec_dat[0] -'0'+ rec_dat[1] -'0';
+		//humit = atoi(showtext);
 		OLED_ShowString(64,2,showtext,16);
+		
 		
 		OLED_ShowChinese(32,4,8,16);/*水位*/
 		OLED_ShowChinese(48,4,9,16);
@@ -150,7 +142,7 @@ void Page3(void)
 		OLED_ShowChinese(48,2,4,16);/*湿度*/
 		OLED_ShowChinese(64,2,5,16);
 	
-			sprintf(showtext,":%03d%",limit_humit);
+		sprintf(showtext,":%03d%",limit_humit);
 		OLED_ShowString(80,2,showtext,16);
 	
 
@@ -170,8 +162,8 @@ void Page4(void)
 		OLED_ShowChinese(48,2,0,16);/*成功*/
 		OLED_ShowChinese(64,2,1,16);
 	
-		sprintf(showtext,":%03c%",light_mode);
-		OLED_ShowString(80,2,showtext,16);
+		sprintf(showtext2,":%03d ",light_mode);
+		OLED_ShowString(80,2,showtext2,16);
 
 	
 	
@@ -224,7 +216,7 @@ void Key_Proc(void)
 {
 		if(key[0].single_flag == 1)//按键SW1 短按
 	{	
-		func_index=table[func_index].enter;//获取enter索引号
+		func_index=table[func_index].back;//获取enter索引号
 		OLED_Clear();
 		key[0].single_flag = 0;
 	}
@@ -243,7 +235,7 @@ void Key_Proc(void)
 			if(func_index == 4)
 			{
 				light_mode++;
-				if(light_mode >= 7)light_mode =0;
+				if(light_mode >=6)light_mode =0;
 			}
 			new_limit_humit=limit_humit;
 			new_light_mode = light_mode;
@@ -265,7 +257,7 @@ void Key_Proc(void)
 			{
 				
 				light_mode--;
-				if(light_mode <= 0)light_mode =7;
+				if(light_mode <= 0)light_mode =5;
 			}
 			new_limit_humit=limit_humit;
 			new_light_mode = light_mode;
@@ -277,7 +269,7 @@ void Key_Proc(void)
 //==============================================		
 	if(key[3].single_flag == 1)//关闭
 	{
-		func_index=table[func_index].back;//获取last索引号
+		func_index=table[func_index].enter;//获取last索引号
 		OLED_Clear();
 		
 		key[3].single_flag = 0;
@@ -287,7 +279,7 @@ void Key_Proc(void)
 		if(key[3].longkey_flag == 1)//长按关闭雾化器;
 	{
 		  if(func_index==0)//获取last索引号
-	{
+		{
 				setting_duty ^= 1;
 			
 				if(setting_duty == 0)
@@ -306,11 +298,22 @@ void Key_Proc(void)
 		}
 	}
 	
-	if(new_limit_humit < humit)
+		  if(func_index==0)//获取last索引号
+	{
+		if(humit >= limit_humit )
 	{
 				PWMA_CCR1H = (u8)(PWM1_off >> 8); //设置占空比时间
 				PWMA_CCR1L = (u8)(PWM1_off);
-	}
+				setting_duty =0;
+	}//else
+	//{			
+		//		PWMA_CCR1H = (u8)(PWM1_on >> 8); //设置占空比时间
+		//	PWMA_CCR1L = (u8)(PWM1_on);
+		//		setting_duty =1;
+	
+	//	}
+		
+		}
 	current_operation_index=table[func_index].current_operation;//执行当前索引号所对应的功能函数。
   (*current_operation_index)();
 }

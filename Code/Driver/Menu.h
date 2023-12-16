@@ -11,10 +11,10 @@ typedef struct
 {
     u8 current;//当前状态索引号
 	
-    u8 enter; //确定  长按进入菜单   长按返回
+    u8 back; //确定  长按进入菜单   长按返回
     u8 next;  //+
     u8 last; //-
-    u8 back; //一键关闭喷雾
+    u8 enter; //一键关闭喷雾
 	
     void (*current_operation)(void); //当前状态应该执行的操作
 } Menu_table;

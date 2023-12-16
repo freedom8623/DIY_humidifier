@@ -1,6 +1,5 @@
 #include "ws2812b.h"
 
-
 void Delayus(int a)		//@24.000MHz
 {
 	unsigned char i;
@@ -58,12 +57,31 @@ void Delay300us()		//@24.000MHz
 }
 
 
-void Send_offled(void)
-{
-	EA = 0;
-	//char OFFValue = {0,0,0};
-	//WS_SendData(&OFFValue);		
-	LED = 0;
-	Delay300us();
-	EA = 1;
-}
+//void lightmode(unsigned int *new_light_mode)
+//{
+//	switch(*new_light_mode){
+//		case 0:
+//		WS_SendData(colorcode[0]);
+//		break;
+//	
+//		case 1:
+//		WS_SendData(colorcode[1]);
+//		break;
+//	
+//		case 2:
+//		WS_SendData(colorcode[2]);
+//		break;
+//	
+//		case 3:
+//		WS_SendData(colorcode[3]);
+//		break;
+//	
+//		case 4:
+//		WS_SendData(colorcode[4]);
+//		break;
+//	
+//		case 5:
+//		WS_SendData(colorcode[5]);
+//		break;
+//	}
+//}

@@ -95,8 +95,9 @@ uchar DHT11_rec_byte()      //接收一个字节
   从机拉高data线后，延迟40us左右（28~70us之间）主机再次读取data线电平，如果为低电平，则为“0”，如果为高电平，则为“1”。
 3.继续重复上述1,2步骤累计40次。
 ------------------------------------------------*/
-unsigned int DHT_T;
+unsigned int humit;
 uchar T_H;
+
 void DHT11_receive()      //接收40位的数据
 {
 		uchar R_H,R_L,T_L,RH,RL,TH,TL,revise; 
@@ -128,6 +129,7 @@ void DHT11_receive()      //接收40位的数据
             TL=T_L;
         } 
 				
+				humit = RH;
         /*数据处理，转换为字符，方便显示*/
 			  //湿度
 				rec_dat[0]='0'+(RH/10);
@@ -139,6 +141,8 @@ void DHT11_receive()      //接收40位的数据
         rec_dat[4]='0'+(TH/10);
         rec_dat[5]='0'+(TH%10); 
 		    rec_dat[6]=' ';
+				
+			
 			
     }
 

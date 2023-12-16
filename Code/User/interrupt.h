@@ -14,6 +14,7 @@ sbit Water_test = P3^6;
 //按键的结构体 结构体在mian.h
 extern struct keys key[];
 
+
 //按键结构体
 struct keys
 {
@@ -24,5 +25,5 @@ struct keys
 	int longkey_flag;//长按标志位
 	
 };
-void Alertor(void);
+void Alertor(unsigned int new_light_mode);
 #endif

@@ -1,10 +1,12 @@
 #include "interrupt.h"
 #include "ws2812b.h"
 #include "Menu.h"
+#include "RGB_Font.h"
+
 //定时器2中断主要用于系统时钟
 //定时器1ns
 //定时器1ns
-unsigned int new_light_mode;
+
 int T_Tick;
 char  leddata[] = {000,256,000};
 char  leddata2[] = {256,000,10};
@@ -26,7 +28,7 @@ void timer2_int (void) interrupt 12
 extern unsigned int Water_Flag;
 
 
-void Alertor(void)
+void Alertor(unsigned int i)
 {
 
 	
@@ -34,8 +36,31 @@ void Alertor(void)
 		{
 			
 //			leddata2[1] = new_light_mode;
-			Water_Flag=1;
-			WS_SendData(&leddata2);		
+		switch(i){
+		case 0:
+		WS_SendData(colorcode[0]);
+		break;
+	
+		case 1:
+		WS_SendData(colorcode[1]);
+		break;
+	
+		case 2:
+		WS_SendData(colorcode[2]);
+		break;
+	
+		case 3:
+		WS_SendData(colorcode[3]);
+		break;
+	
+		case 4:
+		WS_SendData(colorcode[4]);
+		break;
+	
+		case 5:
+		WS_SendData(colorcode[5]);
+		break;
+		}	
 		}
 		if(Water_test == 0)
 		{
@@ -87,7 +112,7 @@ void timer3_int(void) interrupt 19
 				if(key[i].key_sta == 0)
 					{
 						key[i].judge_sta = 2;
-						key[i].key_time++;
+						
 					}
 				else
 					{
@@ -98,6 +123,7 @@ void timer3_int(void) interrupt 19
 									
 				case 2 :
 				{
+					key[i].key_time++;
 					//证明按下后松手
 						if(key[i].key_sta == 1)
 					{
@@ -105,7 +131,7 @@ void timer3_int(void) interrupt 19
 								//确定是否为短按
 						if(key[i].key_time<=100)
 							{
-							key[i].single_flag = 0;
+							key[i].single_flag = 1;
 							}else
 							{
 							key[i].longkey_flag = 1;
